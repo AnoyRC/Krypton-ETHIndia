@@ -1,9 +1,5 @@
-// SPDX-License-Identifier: GPL-3.0
+//SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
-
-/* solhint-disable avoid-low-level-calls */
-/* solhint-disable no-inline-assembly */
-/* solhint-disable reason-string */
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
@@ -13,25 +9,11 @@ import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "./callback/TokenCallbackHandler.sol";
 import "./base/GuardianManager.sol";
 
+
 /**
-  * minimal account.
-  *  this is sample minimal account.
-  *  has execute, eth handling methods
-  *  has a single signer that can send requests through the entryPoint.
-  */
-contract Krypton is GuardianManager, UUPSUpgradeable, TokenCallbackHandler {
-    using ECDSA for bytes32;
-
-    event SimpleAccountInitialized(IEntryPoint indexed entryPoint, address indexed owner);
-
-    /// @inheritdoc BaseAccount
-    function entryPoint() public view virtual override returns (IEntryPoint) {
-        return _entryPoint;
-    }
-
-	constructor(IEntryPoint anEntryPoint) GuardianManager(anEntryPoint) {
-
-	}
+ * @author Anoy Roy Chowdhury
+ */
+contract Krypton is TokenCallbackHandler, UUPSUpgradeable, GuardianManager {
 
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
@@ -39,16 +21,18 @@ contract Krypton is GuardianManager, UUPSUpgradeable, TokenCallbackHandler {
     /**
      * execute a transaction (called directly from owner, or by entryPoint)
      */
-    function execute(address dest, uint256 value, bytes calldata func) external {
+    function execute(address dest, uint256 value, bytes calldata func, bytes memory signature) external notInRecovery check2FA(signature){
         _requireFromEntryPointOrOwner();
         _call(dest, value, func);
     }
+
+    constructor(IEntryPoint anEntryPoint) GuardianManager(anEntryPoint) {}
 
     /**
      * execute a sequence of transactions
      * @dev to reduce gas consumption for trivial case (no value), use a zero-length array to mean zero value
      */
-    function executeBatch(address[] calldata dest, uint256[] calldata value, bytes[] calldata func) external {
+    function executeBatch(address[] calldata dest, uint256[] calldata value, bytes[] calldata func, bytes memory signature) external notInRecovery check2FA(signature){
         _requireFromEntryPointOrOwner();
         require(dest.length == func.length && (value.length == 0 || value.length == func.length), "wrong array lengths");
         if (value.length == 0) {
@@ -63,29 +47,6 @@ contract Krypton is GuardianManager, UUPSUpgradeable, TokenCallbackHandler {
     }
 
     /**
-     * @dev The _entryPoint member is immutable, to reduce gas consumption.  To upgrade EntryPoint,
-     * a new implementation of SimpleAccount must be deployed with the new EntryPoint address, then upgrading
-      * the implementation by calling `upgradeTo()`
-     */
-    function initialize(address anOwner) public virtual initializer {
-        _initialize(anOwner);
-    }
-
-    function _initialize(address anOwner) internal virtual {
-        owner = anOwner;
-        emit SimpleAccountInitialized(_entryPoint, owner);
-    }
-
-    /// implement template method of BaseAccount
-    function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash)
-    internal override virtual returns (uint256 validationData) {
-        bytes32 hash = userOpHash.toEthSignedMessageHash();
-        if (owner != hash.recover(userOp.signature))
-            return SIG_VALIDATION_FAILED;
-        return 0;
-    }
-
-    /**
      * check current account deposit in the entryPoint
      */
     function getDeposit() public view returns (uint256) {
@@ -95,7 +56,7 @@ contract Krypton is GuardianManager, UUPSUpgradeable, TokenCallbackHandler {
     /**
      * deposit more funds for this account in the entryPoint
      */
-    function addDeposit() public payable {
+    function addDeposit() public notInRecovery payable {
         entryPoint().depositTo{value : msg.value}(address(this));
     }
 
@@ -104,7 +65,7 @@ contract Krypton is GuardianManager, UUPSUpgradeable, TokenCallbackHandler {
      * @param withdrawAddress target to send to
      * @param amount to withdraw
      */
-    function withdrawDepositTo(address payable withdrawAddress, uint256 amount) public onlyOwner {
+    function withdrawDepositTo(address payable withdrawAddress, uint256 amount) public notInRecovery onlyOwner {
         entryPoint().withdrawTo(withdrawAddress, amount);
     }
 

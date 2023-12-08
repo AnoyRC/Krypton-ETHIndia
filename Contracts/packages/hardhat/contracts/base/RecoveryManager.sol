@@ -57,7 +57,6 @@ contract RecoveryManager is TwoFactorManager{
             false
         );
         inRecovery = true;
-        guardianToRemoveTimestamp[msg.sender] = block.timestamp;
         nonce++;
         emit RecoveryInitiated(msg.sender, _proposedOwner, currRecoveryRound);
     }
@@ -71,7 +70,6 @@ contract RecoveryManager is TwoFactorManager{
             currRecoveryRound,
             false
         );
-        guardianToRemoveTimestamp[msg.sender] = block.timestamp;
         emit RecoverySupported(msg.sender, _proposedOwner, currRecoveryRound);
     }
 
@@ -101,7 +99,6 @@ contract RecoveryManager is TwoFactorManager{
         inRecovery = false;
         address _oldOwner = owner;
         owner = newOwner;
-        guardianToRemoveTimestamp[msg.sender] = block.timestamp;
         lastRecoveryTime = block.timestamp;
         nonce++;
 

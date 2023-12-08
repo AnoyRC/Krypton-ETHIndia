@@ -53,7 +53,6 @@ contract GuardianManager is RecoveryManager{
             false
         );
         inGuardianRequest = true;
-        guardianToRemoveTimestamp[msg.sender] = block.timestamp;
         nonce++;
 
         emit GuardianshipTransferInitiated(newGuardian, guardianToChange);
@@ -88,7 +87,6 @@ contract GuardianManager is RecoveryManager{
         require(!(newGuardian == owner), "Provided Address can't be the Owner");
         // isGuardian[newGuardian] = true;
         guardians.add(newGuardian);
-        guardianToRemoveTimestamp[newGuardian] = block.timestamp;
         nonce++;
 
         emit GuardianAdded(msg.sender, newGuardian);
