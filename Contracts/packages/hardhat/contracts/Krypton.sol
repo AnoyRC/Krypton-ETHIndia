@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "./callback/TokenCallbackHandler.sol";
-import "./base/OwnerManager.sol";
+import "./base/TwoFactorManager.sol";
 
 /**
   * minimal account.
@@ -19,7 +19,7 @@ import "./base/OwnerManager.sol";
   *  has execute, eth handling methods
   *  has a single signer that can send requests through the entryPoint.
   */
-contract Krypton is OwnerManager, UUPSUpgradeable, TokenCallbackHandler {
+contract Krypton is TwoFactorManager, UUPSUpgradeable, TokenCallbackHandler {
     using ECDSA for bytes32;
 
     event SimpleAccountInitialized(IEntryPoint indexed entryPoint, address indexed owner);
@@ -29,7 +29,7 @@ contract Krypton is OwnerManager, UUPSUpgradeable, TokenCallbackHandler {
         return _entryPoint;
     }
 
-	constructor(IEntryPoint anEntryPoint) OwnerManager(anEntryPoint) {
+	constructor(IEntryPoint anEntryPoint) TwoFactorManager(anEntryPoint) {
 
 	}
 
