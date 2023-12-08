@@ -9,7 +9,9 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract OwnerManager is BaseAccount, Initializable {
+import "../interfaces/IOwnerManager.sol";
+
+contract OwnerManager is BaseAccount, Initializable, IOwnerManager {
     using ECDSA for bytes32;    
 
     using EnumerableSet for EnumerableSet.AddressSet;
