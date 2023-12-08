@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.12;
+pragma solidity >=0.8.0 <0.9.0;
 
 /* solhint-disable avoid-low-level-calls */
 /* solhint-disable no-inline-assembly */
@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "./callback/TokenCallbackHandler.sol";
-import "./base/TwoFactorManager.sol";
+import "./base/RecoveryManager.sol";
 
 /**
   * minimal account.
@@ -19,7 +19,7 @@ import "./base/TwoFactorManager.sol";
   *  has execute, eth handling methods
   *  has a single signer that can send requests through the entryPoint.
   */
-contract Krypton is TwoFactorManager, UUPSUpgradeable, TokenCallbackHandler {
+contract Krypton is RecoveryManager, UUPSUpgradeable, TokenCallbackHandler {
     using ECDSA for bytes32;
 
     event SimpleAccountInitialized(IEntryPoint indexed entryPoint, address indexed owner);
@@ -29,7 +29,7 @@ contract Krypton is TwoFactorManager, UUPSUpgradeable, TokenCallbackHandler {
         return _entryPoint;
     }
 
-	constructor(IEntryPoint anEntryPoint) TwoFactorManager(anEntryPoint) {
+	constructor(IEntryPoint anEntryPoint) RecoveryManager(anEntryPoint) {
 
 	}
 
