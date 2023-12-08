@@ -24,8 +24,6 @@ contract OwnerManager is BaseAccount, Initializable, IOwnerManager {
 
     IEntryPoint internal immutable _entryPoint;
 
-    mapping (address => uint256) public guardianToRemoveTimestamp;
-
     event KryptonInitialized(IEntryPoint indexed entryPoint, address indexed owner);
 
     modifier onlyOwner() {
@@ -61,7 +59,6 @@ contract OwnerManager is BaseAccount, Initializable, IOwnerManager {
             require(!guardians.contains(guardianAddr[i]), "Duplicate Guardian Found");
           
             guardians.add(guardianAddr[i]);
-            guardianToRemoveTimestamp[guardianAddr[i]] = block.timestamp;
         }
         threshold = _threshold;
         owner = _owner;
