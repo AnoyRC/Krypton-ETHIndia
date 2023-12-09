@@ -1,69 +1,47 @@
-"use client";
-import TransactionButton from "@/components/layout/main/dashboard/transactions/TransactionButton";
-import { Card, CardHeader, CardBody } from "@material-tailwind/react";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { ChainConfig } from "@/lib/ChainConfig";
+'use client';
+import TransactionButton from '@/components/layout/main/dashboard/transactions/TransactionButton';
+import { ChainConfig } from '@/lib/ChainConfig';
+import { Card, CardHeader, CardBody } from '@material-tailwind/react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { CovalentClient } from '@covalenthq/client-sdk';
 
 export default function Transactions() {
   const searchParams = useSearchParams();
   const currentConfig = ChainConfig.find(
-    (c) => c.chainId.toString() === "80001"
+    (c) => c.chainId.toString() === searchParams.get('wallet').split(':')[0]
   );
-  const transactions = [
-    {
-      from_address: "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-      to_address: "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-      value: "1000000000000000000",
-      type: "send",
-      block_signed_at: new Date(),
-      explorers: [
-        {
-          name: "Etherscan",
-          url: "https://etherscan.io/tx/0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-        },
-      ],
-    },
-    {
-      from_address: "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-      to_address: "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-      value: "1000000000000000000",
-      type: "send",
-      block_signed_at: new Date(),
-      explorers: [
-        {
-          name: "Etherscan",
-          url: "https://etherscan.io/tx/0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-        },
-      ],
-    },
-    {
-      from_address: "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-      to_address: "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-      value: "1000000000000000000",
-      type: "send",
-      block_signed_at: new Date(),
-      explorers: [
-        {
-          name: "Etherscan",
-          url: "https://etherscan.io/tx/0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-        },
-      ],
-    },
-    {
-      from_address: "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-      to_address: "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-      value: "1000000000000000000",
-      type: "send",
-      block_signed_at: new Date(),
-      explorers: [
-        {
-          name: "Etherscan",
-          url: "https://etherscan.io/tx/0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
-        },
-      ],
-    },
-  ];
+  const [transactions, setTransactions] = useState([]);
+
+  const getTransactions = async () => {
+    if (!currentConfig) {
+      return;
+    }
+
+    const client = new CovalentClient('cqt_rQH3kFYD6MqMJPkwyqJJqmfJbWJx');
+
+    let AllTransactions = [];
+
+    try {
+      for await (const resp of client.TransactionService.getAllTransactionsForAddress(
+        currentConfig.covalentChainName,
+        searchParams.get('wallet').split(':')[1]
+      )) {
+        AllTransactions.push(resp);
+      }
+
+      console.log(AllTransactions);
+      setTransactions(AllTransactions);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (searchParams.get('wallet')) {
+      getTransactions();
+    }
+  }, [searchParams]);
 
   return (
     <div className="w-full h-full z-10 flex items-center justify-center">

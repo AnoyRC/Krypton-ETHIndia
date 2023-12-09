@@ -1,34 +1,40 @@
-"use client";
-import {
-  ExclamationTriangleIcon,
-} from "@heroicons/react/24/outline";
-import { Card, Alert, Button, Select, Option } from "@material-tailwind/react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { ChainConfig } from "@/lib/ChainConfig";
-import { useSearchParams } from "next/navigation";
-
+'use client';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Card, Alert, Button, Select, Option } from '@material-tailwind/react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { ChainConfig } from '@/lib/ChainConfig';
+import { useSearchParams } from 'next/navigation';
+import { createPublicClient, http } from 'viem';
+import useSendTransaction from '@/hooks/useSendTransaction';
+import { BigNumber, ethers } from 'ethers';
+import { useSelector } from 'react-redux';
 
 export default function Tokens() {
-  const [amount, setAmount] = useState("0.00");
-  const [selected, setSelected] = useState("");
-  const [recipient, setRecipient] = useState("");
+  const [amount, setAmount] = useState('0.00');
+  const [selected, setSelected] = useState('');
+  const [recipient, setRecipient] = useState('');
 
-  const [errorTitle, setErrorTitle] = useState("Invalid Recipient");
+  const [errorTitle, setErrorTitle] = useState('Invalid Recipient');
   const [errorDescription, setErrorDescription] = useState(
-    "Please check the recipient address and try again."
+    'Please check the recipient address and try again.'
   );
   const searchParams = useSearchParams();
   const [isError, setIsError] = useState(false);
-  
+  const currentConfig = ChainConfig.find(
+    (chain) =>
+      chain.chainId.toString() === searchParams.get('wallet')?.split(':')[0]
+  );
+  const { initiateTransaction } = useSendTransaction();
+  const isOwner = useSelector((state) => state.wallet.isOwner);
 
   useEffect(() => {
-    if (searchParams.get("wallet")) {
+    if (searchParams.get('wallet')) {
       setSelected(
         ChainConfig.find(
           (chain) =>
             chain.chainId.toString() ===
-            searchParams.get("wallet")?.split(":")[0]
+            searchParams.get('wallet')?.split(':')[0]
         )?.tokens[0].name
       );
     }
@@ -44,9 +50,9 @@ export default function Tokens() {
               Transfer your tokens to other wallets
             </p>
           </div>
-          <Card className="flex gap-2 font-uni bg-black/80 text-white flex-row p-3">
+          <Card className="flex gap-1 font-uni bg-black/80 text-white flex-row p-3">
             <Image
-              src="/images/main/dashboard/transfer/fuel.svg"
+              src="/images/main/dashboard/swap/fuel.svg"
               width={20}
               height={20}
               alt="fuel"
@@ -68,16 +74,16 @@ export default function Tokens() {
               {ChainConfig.find(
                 (chain) =>
                   chain.chainId.toString() ===
-                  searchParams.get("wallet")?.split(":")[0]
+                  searchParams.get('wallet')?.split(':')[0]
               ) && (
                 <Select
                   size="md"
                   labelProps={{
-                    className: "before:content-none after:content-none",
+                    className: 'before:content-none after:content-none',
                   }}
                   className="border-transparent text-white font-uni font-extrabold text-2xl py-0 "
                   containerProps={{
-                    className: "pb-3 min-w-0 w-[180px]",
+                    className: 'pb-3 min-w-0 w-[180px]',
                   }}
                   value={selected}
                   onChange={(e) => setSelected(e)}
@@ -85,7 +91,7 @@ export default function Tokens() {
                   {ChainConfig.find(
                     (chain) =>
                       chain.chainId.toString() ===
-                      searchParams.get("wallet")?.split(":")[0]
+                      searchParams.get('wallet')?.split(':')[0]
                   )?.tokens.map((token) => (
                     <Option
                       key={token.name}
@@ -119,7 +125,112 @@ export default function Tokens() {
         <Button
           size="lg"
           className="bg-black/80"
-          disabled={true}
+          disabled={!isOwner}
+          onClick={async () => {
+            if (!recipient) {
+              setIsError(true);
+              setErrorTitle('Invalid Recipient');
+              setErrorDescription(
+                'Please check the recipient address and try again.'
+              );
+              return;
+            }
+
+            if (Number(amount) <= 0) {
+              setIsError(true);
+              setErrorTitle('Invalid Amount');
+              setErrorDescription('Please check the amount and try again.');
+              return;
+            }
+
+            const publicClient = createPublicClient({
+              transport: http(
+                ChainConfig.find(
+                  (chain) =>
+                    chain.chainId.toString() ===
+                    searchParams.get('wallet')?.split(':')[0]
+                )?.rpc
+              ),
+              chain: ChainConfig.find(
+                (chain) =>
+                  chain.chainId.toString() ===
+                  searchParams.get('wallet')?.split(':')[0]
+              )?.chainId,
+            });
+
+            const selectedToken = currentConfig.tokens.find(
+              (token) => token.name === selected
+            );
+            if (!selectedToken) return;
+
+            if (selectedToken.isNative) {
+              const balance = await publicClient.getBalance({
+                address: searchParams.get('wallet')?.split(':')[1],
+              });
+
+              if (
+                Number(balance) / 10 ** selectedToken.decimals <
+                Number(amount)
+              ) {
+                setIsError(true);
+                setErrorTitle('Insufficient Balance');
+                setErrorDescription('Please check your balance and try again.');
+                return;
+              }
+
+              setIsError(false);
+
+              initiateTransaction(
+                'execute',
+                [recipient, ethers.utils.parseUnits(amount.toString()), '0x'],
+                'Transferred Successfully'
+              );
+            } else {
+              const tokenContract = new ethers.Contract(
+                selectedToken.address,
+                [
+                  'function transfer(address to, uint256 amount) external returns (bool)',
+                  'function balanceOf(address account) external view returns (uint256)',
+                ],
+                new ethers.providers.JsonRpcProvider(publicClient.transport.url)
+              );
+
+              const balance = await tokenContract.balanceOf(
+                searchParams.get('wallet')?.split(':')[1]
+              );
+
+              console.log(
+                (Number(amount) * 10 ** selectedToken.decimals).toString
+              );
+
+              if (
+                Number(balance) / 10 ** selectedToken.decimals <
+                Number(amount)
+              ) {
+                setIsError(true);
+                setErrorTitle('Insufficient Balance');
+                setErrorDescription('Please check your balance and try again.');
+                return;
+              }
+
+              setIsError(false);
+
+              initiateTransaction(
+                'execute',
+                [
+                  tokenContract.address,
+                  ethers.constants.Zero,
+                  tokenContract.interface.encodeFunctionData('transfer', [
+                    recipient,
+                    BigNumber.from(
+                      (Number(amount) * 10 ** selectedToken.decimals).toString()
+                    ),
+                  ]),
+                ],
+                'Transferred Successfully'
+              );
+            }
+          }}
         >
           Transfer
         </Button>

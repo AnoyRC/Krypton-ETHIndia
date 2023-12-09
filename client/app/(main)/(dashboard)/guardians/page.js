@@ -1,16 +1,60 @@
-"use client";
-import GuardianCard from "@/components/layout/main/dashboard/guardians/GuardianCard";
-import { Card, CardHeader } from "@material-tailwind/react";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useContractEvent } from "wagmi";
+'use client';
+import GuardianCard from '@/components/layout/main/dashboard/guardians/GuardianCard';
+import useReadContract from '@/hooks/useReadContract';
+import Krypton from '@/lib/contracts/Krypton';
+import { Card, CardHeader } from '@material-tailwind/react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useContractEvent } from 'wagmi';
 
 export default function Guardians() {
+  const [guardians, setGuardians] = useState([]);
+  const { getAllGuardians } = useReadContract();
+  const searchParams = useSearchParams();
 
-  const guardians=[{
-    name:"Rahul",
-    address:"0x2160D41c9D711Ca3fA7777211148538eeb431970"
-  }]
+  useContractEvent({
+    address: searchParams.get('wallet').split(':')[1],
+    abi: Krypton.abi,
+    eventName: 'GuardianshipTransferExecuted',
+    listener(log) {
+      getGuardians();
+    },
+    chainId: Number(searchParams.get('wallet').split(':')[0]),
+  });
+
+  useContractEvent({
+    address: searchParams.get('wallet').split(':')[1],
+    abi: Krypton.abi,
+    eventName: 'GuardianAdded',
+    listener(log) {
+      getGuardians();
+    },
+    chainId: Number(searchParams.get('wallet').split(':')[0]),
+  });
+
+  useEffect(() => {
+    getGuardians();
+  }, []);
+
+  const getGuardians = async () => {
+    const guardians = await getAllGuardians();
+    if (!guardians || guardians.length === 0) return;
+
+    const guardiansWithAddress = guardians.map((guardian) => {
+      return {
+        address:
+          guardian.toString().substring(0, 2) +
+          guardian
+            .toString()
+            .substring(
+              guardian.toString().length - 40,
+              guardian.toString().length
+            ),
+      };
+    });
+
+    setGuardians(guardiansWithAddress);
+  };
 
   return (
     <div className="w-full h-full z-10 flex items-center justify-center">

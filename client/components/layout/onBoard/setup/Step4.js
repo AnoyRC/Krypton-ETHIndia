@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { ChipsInId } from "@/components/ui/chainChips";
-import useDeployKrypton from "@/hooks/useDeployKrypton";
-import useKrypton from "@/hooks/useKrypton";
+import { ChipsInId } from '@/components/ui/chainChips';
+import useDeployKrypton from '@/hooks/useDeployKrypton';
+import useKrypton from '@/hooks/useKrypton';
 import {
   setActiveStep,
   setGuardians,
   setName,
   setTwoFactorAddress,
-} from "@/redux/slice/setupSlice";
-import { CheckIcon } from "@heroicons/react/24/outline";
+} from '@/redux/slice/setupSlice';
+import { CheckIcon } from '@heroicons/react/24/outline';
 import {
   Chip,
   CardHeader,
@@ -18,11 +18,12 @@ import {
   Button,
   Stepper,
   Step,
-} from "@material-tailwind/react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+} from '@material-tailwind/react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useAccount } from 'wagmi';
 
 export default function Step4() {
   const chain = useSelector((state) => state.setup.chain);
@@ -41,6 +42,7 @@ export default function Step4() {
   const { createKrypton, checkWalletCode } = useDeployKrypton();
   const [deployedAddress, setDeployedAddress] = useState(null);
   const { executeTransaction, prepareEnableTwoFactorAuth } = useKrypton();
+  const { address } = useAccount();
 
   const execute = async () => {
     // setTimeout(() => {
@@ -66,11 +68,17 @@ export default function Step4() {
     await checkWalletCode(walletAddress);
     setSteps(1);
 
-    //Dataverse OS
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await axios
+      .post('/api/krypton/create', {
+        kryptonName: name,
+        walletAddress: address,
+        kryptonAddress: walletAddress,
+      })
+      .then((res) => {
+        console.log(res.data);
+      });
     setSteps(2);
 
-    //2FA
     if (!twoFactorAddress) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setSteps(3);
@@ -85,7 +93,7 @@ export default function Step4() {
         setSteps(0);
         return;
       }
-      await executeTransaction(walletAddress, chain, tx, "2FA Enabled");
+      await executeTransaction(walletAddress, chain, tx, '2FA Enabled');
       setSteps(3);
     }
 
@@ -105,7 +113,7 @@ export default function Step4() {
         className="-mt-2 mb-4 mx-0 grid h-20 place-items-center"
       >
         <h1 className="font-uni text-white text-3xl font-bold">
-          {isDeployed ? "Welcome" : "Review"}
+          {isDeployed ? 'Welcome' : 'Review'}
         </h1>
       </CardHeader>
 
@@ -171,7 +179,7 @@ export default function Step4() {
             className=""
             onClick={() => {
               dispatch(setActiveStep(0));
-              router.push("/wallet");
+              router.push('/wallet');
             }}
           >
             Cancel
@@ -189,11 +197,11 @@ export default function Step4() {
           </Stepper>
 
           <div className="font-uni flex items-center gap-2 text-lg">
-            {steps === 0 && "Deploying Krypton"}
-            {steps === 1 && "Registering to Dataverse OS"}
+            {steps === 0 && 'Deploying Krypton'}
+            {steps === 1 && 'Registering to Dataverse OS'}
             {steps === 2 &&
-              (twoFactorAddress ? "Setting up 2FA" : "2FA Disabled, Skipping")}
-            {steps === 3 && "Krypton Deployed"}
+              (twoFactorAddress ? 'Setting up 2FA' : '2FA Disabled, Skipping')}
+            {steps === 3 && 'Krypton Deployed'}
             {steps !== 3 && (
               <Image
                 src="/images/onboard/setup/loading.svg"
@@ -224,8 +232,8 @@ export default function Step4() {
               router.push(`/home?wallet=${chain}:${deployedAddress}`);
               dispatch(setActiveStep(0));
               dispatch(setTwoFactorAddress(null));
-              dispatch(setName(""));
-              dispatch(setGuardians([{ name: "", address: "" }]));
+              dispatch(setName(''));
+              dispatch(setGuardians([{ name: '', address: '' }]));
             }}
           >
             Step into your Krypton
