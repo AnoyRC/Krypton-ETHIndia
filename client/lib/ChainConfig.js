@@ -1,6 +1,6 @@
 export const ChainConfig = [
   {
-    factory: "0x48CF83C3dad1370155d9323384FFDe76bc433d37",
+    factory: "0x3A470fCebd81A05d323d287fFB9f20631D39ee80",
     name: "Mumbai",
     chainId: 80001,
     rpc: `https://polygon-mumbai.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`,
