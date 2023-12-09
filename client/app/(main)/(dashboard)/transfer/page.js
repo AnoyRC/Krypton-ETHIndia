@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { ChainConfig } from "@/lib/ChainConfig";
 import { useSearchParams } from "next/navigation";
 
-import { useSelector } from "react-redux";
 
 export default function Tokens() {
   const [amount, setAmount] = useState("0.00");
