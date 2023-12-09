@@ -1,16 +1,17 @@
-'use client';
-import { WagmiConfig, createConfig, configureChains, mainnet } from 'wagmi';
-import { publicProvider } from 'wagmi/providers/public';
-import { InjectedConnector } from 'wagmi/connectors/injected';
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-import { goerli, polygon, polygonMumbai } from 'wagmi/chains';
+"use client";
+import { WagmiConfig, createConfig, configureChains, mainnet } from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { goerli, polygon, polygonMumbai } from "wagmi/chains";
 
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
-import { oAuthConnector } from '@/wagmi/oAuthConnector';
+import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
+import { oAuthConnector } from "@/wagmi/oAuthConnector";
+import { alchemyProvider } from "wagmi/providers/alchemy";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [polygon],
+  [polygon, polygonMumbai],
   [publicProvider()]
 );
 
@@ -21,7 +22,7 @@ const config = createConfig({
     new CoinbaseWalletConnector({
       chains,
       options: {
-        appName: 'wagmi',
+        appName: "wagmi",
       },
     }),
     new WalletConnectConnector({
@@ -33,7 +34,7 @@ const config = createConfig({
     new InjectedConnector({
       chains,
       options: {
-        name: 'Injected',
+        name: "Injected",
         shimDisconnect: true,
       },
     }),
