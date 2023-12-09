@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Krypton | Intiate",
-  description: "By Bankless DAO",
+  title: 'Krypton | Initiate',
+  description: '2FA Smart Contract Wallet',
 };
 
 export default function InitiateLayout({ children }) {

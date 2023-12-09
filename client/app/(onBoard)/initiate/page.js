@@ -1,11 +1,16 @@
-"use client";
-
+'use client';
+import {
+  openDrawer,
+  openInitiateDrawer,
+  setInitiateChainId,
+  setInitiateWalletAddress,
+} from '@/redux/slice/sigManagerSlice';
 import {
   ArrowLeftOnRectangleIcon,
   ArrowPathIcon,
   InformationCircleIcon,
   PlusIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 import {
   CardHeader,
   CardBody,
@@ -14,20 +19,32 @@ import {
   Alert,
   Select,
   Option,
-} from "@material-tailwind/react";
-import { useDispatch } from "react-redux";
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
-import { useSelector } from "react-redux";
-import { setChain } from "@/redux/slice/setupSlice";
-import { MumbaiChip, PolygonChip } from "@/components/ui/chainChips";
-import { useEffect, useState } from "react";
+} from '@material-tailwind/react';
+import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
+import { useSelector } from 'react-redux';
+import { setChain } from '@/redux/slice/setupSlice';
+import { MumbaiChip, PolygonChip } from '@/components/ui/chainChips';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { ChainConfig } from '@/lib/ChainConfig';
+import useDeployKrypton from '@/hooks/useDeployKrypton';
+import {
+  setFnArgs,
+  setFnName,
+  setSuccessMessage,
+} from '@/redux/slice/walletSlice';
 
 export default function Setup() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const { isConnected } = useAccount();
   const chain = useSelector((state) => state.setup.chain);
-  const [walletAddress, setWalletAddress] = useState("");
+  const [walletAddress, setWalletAddress] = useState('');
   const { chain: currentChain } = useNetwork();
+  const { switchNetwork } = useSwitchNetwork();
+  const { checkWalletCode } = useDeployKrypton();
   const [client, setClient] = useState(null);
 
   useEffect(() => {
@@ -55,7 +72,7 @@ export default function Setup() {
                 placeholder="Enter Wallet Address"
                 className=" !border-t-blue-gray-200 focus:!border-t-gray-900 -my-2"
                 labelProps={{
-                  className: "before:content-none after:content-none",
+                  className: 'before:content-none after:content-none',
                 }}
                 value={walletAddress}
                 onChange={(e) => setWalletAddress(e.target.value)}
@@ -66,10 +83,10 @@ export default function Setup() {
                 variant="static"
                 label=""
                 containerProps={{
-                  className: "-mt-5 mb-2 mb-4",
+                  className: '-mt-5 mb-2 mb-4',
                 }}
                 labelProps={{
-                  className: "my-2",
+                  className: 'my-2',
                 }}
                 className="my-2"
                 animate={{
@@ -90,6 +107,47 @@ export default function Setup() {
               <Button
                 size="lg"
                 className="flex items-center justify-center -mt-2 gap-3 capitalize text-lg font-uni bg-black/80"
+                onClick={async () => {
+                  if (
+                    !walletAddress ||
+                    !walletAddress.startsWith('0x') ||
+                    walletAddress.length !== 42
+                  ) {
+                    toast.error('Please enter a wallet address');
+                    return;
+                  }
+
+                  const currentConfig = ChainConfig.find(
+                    (c) => c.chainId.toString() === chain
+                  );
+
+                  if (!currentConfig) {
+                    toast.error('Chain not yet Supported');
+                    return;
+                  }
+
+                  const isCorrectChain =
+                    currentChain.id === currentConfig.chainId;
+
+                  if (!isCorrectChain) {
+                    toast.error('Please switch to the correct chain');
+                    return;
+                  }
+
+                  const isValidKrypton = await checkWalletCode(walletAddress);
+
+                  if (!isValidKrypton) {
+                    toast.error('Invalid Krypton Wallet');
+                    return;
+                  }
+
+                  dispatch(openInitiateDrawer());
+                  dispatch(setFnName('initiateRecovery'));
+                  dispatch(setFnArgs([walletAddress]));
+                  dispatch(setInitiateWalletAddress(walletAddress));
+                  dispatch(setInitiateChainId(chain));
+                  dispatch(setSuccessMessage('Recovery Initiated'));
+                }}
               >
                 Initiate Recovery
               </Button>
@@ -108,6 +166,9 @@ export default function Setup() {
                   size="lg"
                   variant="outlined"
                   className="flex items-center gap-3 -mt-2 capitalize text-lg font-uni mb-2"
+                  onClick={() => {
+                    switchNetwork(Number(chain));
+                  }}
                 >
                   <ArrowPathIcon className="h-7 w-7" />
                   Change Network
@@ -118,6 +179,7 @@ export default function Setup() {
                 size="lg"
                 variant="outlined"
                 className="flex items-center gap-3 -mt-2 capitalize text-lg font-uni"
+                onClick={() => router.push('/wallet')}
               >
                 <ArrowLeftOnRectangleIcon className="h-7 w-7" />
                 Back To Wallet
@@ -128,6 +190,9 @@ export default function Setup() {
             <Button
               size="lg"
               className="flex items-center justify-center -mt-2 gap-3 capitalize text-lg font-uni bg-black/80"
+              onClick={() => {
+                router.push('/login');
+              }}
             >
               Connect Wallet
             </Button>
