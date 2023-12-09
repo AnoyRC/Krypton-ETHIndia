@@ -1,4 +1,7 @@
 'use client';
+import useReadContract from '@/hooks/useReadContract';
+import Krypton from '@/lib/contracts/Krypton';
+import useSendTransaction from '@/hooks/useSendTransaction';
 import {
   InformationCircleIcon,
   MinusIcon,
@@ -11,15 +14,31 @@ import {
   CardHeader,
   Input,
 } from '@material-tailwind/react';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useContractEvent } from 'wagmi';
 import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
 
 export default function General() {
   const previousName = 'Old-Wallet-Name';
-  const [threshold, setThreshold] = useState(2);
-  const [guardianAddress, setGuardianAddress] = useState(
-    '0xgdfgdfres43sdfe3gdgfdgdgfgd'
-  );
+  const [threshold, setThreshold] = useState(0);
+  const [guardianAddress, setGuardianAddress] = useState('');
+  const { getThreshold } = useReadContract();
+  const searchParams = useSearchParams();
+  const { initiateTransaction } = useSendTransaction();
+  const isOwner = useSelector((state) => state.wallet.isOwner);
+  useContractEvent({
+    address: searchParams.get('wallet').split(':')[1],
+    abi: Krypton.abi,
+    eventName: 'ThresholdUpdated',
+    listener(log) {
+      getThreshold().then((res) => {
+        setThreshold(Number(res));
+      });
+    },
+    chainId: Number(searchParams.get('wallet').split(':')[0]),
+  });
 
   const addThreshold = () => {
     setThreshold(threshold + 1);
@@ -29,7 +48,11 @@ export default function General() {
     setThreshold(threshold - 1);
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    getThreshold().then((res) => {
+      setThreshold(Number(res));
+    });
+  }, []);
 
   return (
     <div className="w-full h-full z-10 flex items-center justify-center">
@@ -55,7 +78,7 @@ export default function General() {
         <Button
           className="w-full text-white font-bold bg-black/80"
           size="lg"
-          disabled={true}
+          disabled={!isOwner}
         >
           Update
         </Button>
@@ -76,7 +99,6 @@ export default function General() {
               <PlusIcon className="w-6 h-6" />
             </Button>
           </div>
-
           <Button
             className=" text-white font-bold bg-black/80"
             size="lg"
@@ -92,7 +114,7 @@ export default function General() {
                 'Threshold updated'
               );
             }}
-            disabled={true}
+            disabled={!isOwner}
           >
             Update
           </Button>
@@ -122,7 +144,7 @@ export default function General() {
         <Button
           className="w-full text-white font-bold bg-black/80"
           size="lg"
-          disabled={true}
+          disabled={!isOwner}
           onClick={() => {
             if (
               guardianAddress.length !== 42 ||
