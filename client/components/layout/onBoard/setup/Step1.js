@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   ArbitrumChip,
   BaseChip,
@@ -6,11 +6,11 @@ import {
   PolygonChip,
   PolygonZKChip,
   ScrollChip,
-} from '@/components/ui/chainChips';
-import { setActiveStep, setChain, setName } from '@/redux/slice/setupSlice';
-import { Button, Input, Select, Option, Alert } from '@material-tailwind/react';
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+} from "@/components/ui/chainChips";
+import { setActiveStep, setChain, setName } from "@/redux/slice/setupSlice";
+import { Button, Input, Select, Option, Alert } from "@material-tailwind/react";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 function Icon() {
   return (
@@ -42,7 +42,7 @@ export default function Step1() {
         placeholder="my-awesome-wallet"
         className=" !border-t-blue-gray-200 focus:!border-t-gray-900 -my-2"
         labelProps={{
-          className: 'before:content-none after:content-none',
+          className: "before:content-none after:content-none",
         }}
         value={name}
         onChange={(e) => dispatch(setName(e.target.value))}
@@ -53,10 +53,10 @@ export default function Step1() {
         variant="static"
         label=""
         containerProps={{
-          className: '-mt-5 mb-2',
+          className: "-mt-5 mb-2",
         }}
         labelProps={{
-          className: 'my-2',
+          className: "my-2",
         }}
         className="my-2"
         animate={{
@@ -68,9 +68,6 @@ export default function Step1() {
       >
         <Option value="1">
           <PolygonChip />
-        </Option>
-        <Option value="2">
-          <PolygonZKChip />
         </Option>
         <Option value="3">
           <ArbitrumChip />

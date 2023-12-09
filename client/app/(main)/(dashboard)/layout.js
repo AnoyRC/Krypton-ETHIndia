@@ -1,15 +1,16 @@
-import Navbar from '@/components/layout/main/dashboard/Navbar';
+import DashboardHolder from "@/components/layout/main/DashboardHolder";
+import Navbar from "@/components/layout/main/dashboard/Navbar";
 
 export const metadata = {
-  title: 'Krypton',
-  description: 'By Bankless DAO',
+  title: "Krypton",
+  description: "2FA Smart Contract Wallet",
 };
 
 export default function LandingLayout({ children }) {
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full h-screen flex flex-col">
       <Navbar />
-      {children}
+      <DashboardHolder>{children}</DashboardHolder>
     </div>
   );
 }
