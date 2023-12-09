@@ -1,4 +1,5 @@
 import OnBoardContainer from '@/components/layout/onBoard/OnboardContainer';
+import TwoFacterDrawer from '@/components/drawers/TwoFactorDrawer';
 
 export const metadata = {
   title: 'Krypton | Login',
@@ -8,6 +9,7 @@ export const metadata = {
 export default function OnBoardLayout({ children }) {
   return (
     <>
+      <TwoFacterDrawer />
       <OnBoardContainer>{children}</OnBoardContainer>
     </>
   );
