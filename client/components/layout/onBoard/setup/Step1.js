@@ -1,16 +1,21 @@
-"use client";
+'use client';
 import {
   ArbitrumChip,
   BaseChip,
   CeloChip,
+  MumbaiChip,
   PolygonChip,
   PolygonZKChip,
   ScrollChip,
-} from "@/components/ui/chainChips";
-import { setActiveStep, setChain, setName } from "@/redux/slice/setupSlice";
-import { Button, Input, Select, Option, Alert } from "@material-tailwind/react";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+} from '@/components/ui/chainChips';
+import { ChainConfig } from '@/lib/ChainConfig';
+import { setActiveStep, setChain, setName } from '@/redux/slice/setupSlice';
+import { Button, Input, Select, Option, Alert } from '@material-tailwind/react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
 
 function Icon() {
   return (
@@ -33,6 +38,10 @@ export default function Step1() {
   const dispatch = useDispatch();
   const chain = useSelector((state) => state.setup.chain);
   const name = useSelector((state) => state.setup.name);
+  const router = useRouter();
+  const { chain: currentChain } = useNetwork();
+  const { switchNetwork } = useSwitchNetwork();
+  const { isConnected } = useAccount();
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -42,7 +51,7 @@ export default function Step1() {
         placeholder="my-awesome-wallet"
         className=" !border-t-blue-gray-200 focus:!border-t-gray-900 -my-2"
         labelProps={{
-          className: "before:content-none after:content-none",
+          className: 'before:content-none after:content-none',
         }}
         value={name}
         onChange={(e) => dispatch(setName(e.target.value))}
@@ -53,10 +62,10 @@ export default function Step1() {
         variant="static"
         label=""
         containerProps={{
-          className: "-mt-5 mb-2",
+          className: '-mt-5 mb-2',
         }}
         labelProps={{
-          className: "my-2",
+          className: 'my-2',
         }}
         className="my-2"
         animate={{
@@ -66,42 +75,41 @@ export default function Step1() {
         value={chain}
         onChange={(e) => dispatch(setChain(e))}
       >
-        <Option value="1">
+        <Option value="80001">
+          <MumbaiChip />
+        </Option>
+        <Option value="137">
           <PolygonChip />
-        </Option>
-        <Option value="3">
-          <ArbitrumChip />
-        </Option>
-        <Option value="4">
-          <CeloChip />
-        </Option>
-        <Option value="5">
-          <BaseChip />
-        </Option>
-        <Option value="6">
-          <ScrollChip />
         </Option>
       </Select>
 
-      <Alert variant="gradient" icon={<Icon />} className="mb-2 mr-0">
-        <h6 className="font-bold text-lg mb-2">Change your Wallet Network</h6>
-        <p className="text-sm">
-          You are trying to deploy Krypton on a network that is not selected
-        </p>
-        <Button
-          size="sm"
-          variant="outlined"
-          className="mt-4 border-white text-white mb-1"
-        >
-          Change Network
-        </Button>
-      </Alert>
+      {isConnected && currentChain.id.toString() !== chain && (
+        <Alert variant="gradient" icon={<Icon />} className="mb-2 mr-0">
+          <h6 className="font-bold text-lg mb-2">Change your Wallet Network</h6>
+          <p className="text-sm">
+            You are trying to deploy Krypton on a network that is not selected
+          </p>
+          <Button
+            size="sm"
+            variant="outlined"
+            className="mt-4 border-white text-white mb-1"
+            onClick={() => {
+              switchNetwork(chain);
+            }}
+          >
+            Change Network
+          </Button>
+        </Alert>
+      )}
 
       <div className="flex justify-between">
         <Button
           size="md"
           variant="outlined"
           className="capitalize font-uni font-bold"
+          onClick={() => {
+            router.push('/wallet');
+          }}
         >
           Cancel
         </Button>
@@ -110,6 +118,22 @@ export default function Step1() {
           size="md"
           className="capitalize font-uni font-bold"
           onClick={() => {
+            if (!ChainConfig.find((c) => c.chainId.toString() === chain)) {
+              toast.error('This Chain is not Currently Supported');
+              return;
+            }
+            if (currentChain.id.toString() !== chain) {
+              toast.error('Switch to the correct network');
+              return;
+            }
+            if (!name) {
+              toast.error('Enter a wallet name');
+              return;
+            }
+            if (!isConnected) {
+              toast.error('Connect your wallet');
+              return;
+            }
             dispatch(setActiveStep(1));
           }}
         >

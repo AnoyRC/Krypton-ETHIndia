@@ -1,5 +1,14 @@
-'use client';
-import { Card } from '@material-tailwind/react';
+"use client";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Typography,
+  Input,
+  Checkbox,
+  Button,
+} from "@material-tailwind/react";
 
 export default function OnBoardContainer({ children }) {
   return (

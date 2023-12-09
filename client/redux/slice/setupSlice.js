@@ -69,6 +69,7 @@ export const {
   setSelectedTwoFactor,
   setTwoFactorAddress,
   handleGuardianWalletDialog,
+  setGuardians,
 } = setupSlice.actions;
 
 export default setupSlice.reducer;

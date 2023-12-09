@@ -1,13 +1,18 @@
-'use client';
+"use client";
 import {
   openTwoFADrawer,
   setActiveStep,
   setSelectedTwoFactor,
-} from '@/redux/slice/setupSlice';
-import { CreditCardIcon, KeyIcon } from '@heroicons/react/24/outline';
-import { Button, Checkbox, Chip } from '@material-tailwind/react';
-import Image from 'next/image';
-import { useDispatch, useSelector } from 'react-redux';
+  setTwoFactorAddress,
+} from "@/redux/slice/setupSlice";
+import {
+  CreditCardIcon,
+  KeyIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
+import { Button, Checkbox, Chip } from "@material-tailwind/react";
+import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Step3() {
   const dispatch = useDispatch();
@@ -19,11 +24,23 @@ export default function Step3() {
 
   return (
     <div className="w-full flex flex-col gap-4">
-      <div className="font-uni text-lg font-bold flex gap-2">
-        2FA
-        {twoFactorAddress && <Chip value="enabled"></Chip>}
-        {!twoFactorAddress && <Chip value="disabled"></Chip>}
-        {/* <Chip value="enabled"></Chip> */}
+      <div className="font-uni text-lg font-bold flex justify-between items-center gap-2">
+        <div className="flex gap-2 items-center">
+          2FA
+          {twoFactorAddress && <Chip value="enabled"></Chip>}
+          {!twoFactorAddress && <Chip value="disabled"></Chip>}
+        </div>
+        {twoFactorAddress && (
+          <Button
+            size="sm"
+            className="flex items-center py-[7px] px-3 gap-2  capitalize text-xs font-bold font-uni"
+            onClick={() => {
+              dispatch(setTwoFactorAddress(null));
+            }}
+          >
+            <TrashIcon className="h-4 w-4" />
+          </Button>
+        )}
       </div>
       <Button
         size="lg"
@@ -43,7 +60,7 @@ export default function Step3() {
           <Checkbox checked={checked} onChange={() => {}} />
         )}
       </Button>
-      {/* <Button
+      <Button
         size="lg"
         variant="outlined"
         className="flex items-center justify-between capitalize text-lg font-uni"
@@ -64,9 +81,9 @@ export default function Step3() {
           Polygon ID
         </div>
         {twoFactorAddress && selectedTwoFactor === 1 && (
-          <Checkbox checked={checked} />
+          <Checkbox checked={checked} onChange={() => {}} />
         )}
-      </Button> */}
+      </Button>
       <Button
         size="lg"
         variant="outlined"

@@ -1,7 +1,15 @@
-'use client';
+"use client";
 
-import { ChipsInId } from '@/components/ui/chainChips';
-import { CheckIcon } from '@heroicons/react/24/outline';
+import { ChipsInId } from "@/components/ui/chainChips";
+import useDeployKrypton from "@/hooks/useDeployKrypton";
+import useKrypton from "@/hooks/useKrypton";
+import {
+  setActiveStep,
+  setGuardians,
+  setName,
+  setTwoFactorAddress,
+} from "@/redux/slice/setupSlice";
+import { CheckIcon } from "@heroicons/react/24/outline";
 import {
   Chip,
   CardHeader,
@@ -10,10 +18,11 @@ import {
   Button,
   Stepper,
   Step,
-} from '@material-tailwind/react';
-import Image from 'next/image';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+} from "@material-tailwind/react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Step4() {
   const chain = useSelector((state) => state.setup.chain);
@@ -26,21 +35,66 @@ export default function Step4() {
   const selectedTwoFactor = useSelector(
     (state) => state.setup.selectedTwoFactor
   );
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [isError, setIsError] = useState(false);
+  const { createKrypton, checkWalletCode } = useDeployKrypton();
+  const [deployedAddress, setDeployedAddress] = useState(null);
+  const { executeTransaction, prepareEnableTwoFactorAuth } = useKrypton();
 
-  const demoProcess = () => {
-    setTimeout(() => {
-      setSteps(1);
-    }, 1000);
-    setTimeout(() => {
-      setSteps(2);
-    }, 3000);
-    setTimeout(() => {
+  const execute = async () => {
+    // setTimeout(() => {
+    //   setSteps(1);
+    // }, 1000);
+    // setTimeout(() => {
+    //   setSteps(2);
+    // }, 3000);
+    // setTimeout(() => {
+    //   setSteps(3);
+    // }, 5000);
+    // setTimeout(() => {
+    //   setIsDeployed(true);
+    // }, 7000);
+    const walletAddress = await createKrypton();
+    if (!walletAddress) {
+      setIsError(true);
+      setIsDeploying(false);
+      setSteps(0);
+      return;
+    }
+
+    await checkWalletCode(walletAddress);
+    setSteps(1);
+
+    //Dataverse OS
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setSteps(2);
+
+    //2FA
+    if (!twoFactorAddress) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setSteps(3);
-    }, 5000);
-    setTimeout(() => {
-      setIsDeployed(true);
-    }, 7000);
+    } else {
+      const tx = await prepareEnableTwoFactorAuth(
+        walletAddress,
+        twoFactorAddress
+      );
+      if (!tx) {
+        setIsError(true);
+        setIsDeploying(false);
+        setSteps(0);
+        return;
+      }
+      await executeTransaction(walletAddress, chain, tx, "2FA Enabled");
+      setSteps(3);
+    }
+
+    //Add Two Factor Here
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsDeployed(true);
+    setDeployedAddress(walletAddress);
+    setIsDeploying(false);
   };
 
   return (
@@ -51,7 +105,7 @@ export default function Step4() {
         className="-mt-2 mb-4 mx-0 grid h-20 place-items-center"
       >
         <h1 className="font-uni text-white text-3xl font-bold">
-          {isDeployed ? 'Welcome' : 'Review'}
+          {isDeployed ? "Welcome" : "Review"}
         </h1>
       </CardHeader>
 
@@ -105,29 +159,42 @@ export default function Step4() {
             className=""
             onClick={() => {
               setIsDeploying(true);
-              demoProcess();
+              execute();
             }}
           >
             Create Krypton
           </Button>
-          <Button color="gray" variant="outlined" size="lg" className="">
+          <Button
+            color="gray"
+            variant="outlined"
+            size="lg"
+            className=""
+            onClick={() => {
+              dispatch(setActiveStep(0));
+              router.push("/wallet");
+            }}
+          >
             Cancel
           </Button>
         </>
       )}
-      {isDeploying && !isDeployed && (
+
+      {isDeploying && !isDeployed && !isError && (
         <div className="mt-5 flex flex-col w-full justify-center items-center gap-4">
           <Stepper activeStep={steps}>
+            <Step className="h-4 w-4" />
             <Step className="h-4 w-4" />
             <Step className="h-4 w-4" />
             <Step className="h-4 w-4" />
           </Stepper>
 
           <div className="font-uni flex items-center gap-2 text-lg">
-            {steps === 0 && 'Deploying Krypton'}
-            {steps === 1 && 'Registering to Dataverse OS'}
-            {steps === 2 && 'Krypton Deployed'}
-            {steps !== 2 && (
+            {steps === 0 && "Deploying Krypton"}
+            {steps === 1 && "Registering to Dataverse OS"}
+            {steps === 2 &&
+              (twoFactorAddress ? "Setting up 2FA" : "2FA Disabled, Skipping")}
+            {steps === 3 && "Krypton Deployed"}
+            {steps !== 3 && (
               <Image
                 src="/images/onboard/setup/loading.svg"
                 width={20}
@@ -136,10 +203,33 @@ export default function Step4() {
                 className="opacity-50 animate-spin"
               />
             )}
-            {steps === 2 && (
+            {steps === 3 && (
               <CheckIcon className="text-black w-5 h-5 animate-bounce" />
             )}
           </div>
+        </div>
+      )}
+
+      {isDeployed && !isError && (
+        <div className="mt-5 flex flex-col w-full justify-center items-center gap-4">
+          <div className="font-uni flex items-center gap-2 text-lg">
+            Krypton Deployed
+            <CheckIcon className="text-black w-5 h-5 animate-bounce" />
+          </div>
+
+          <Button
+            size="lg"
+            className="w-full"
+            onClick={() => {
+              router.push(`/home?wallet=${chain}:${deployedAddress}`);
+              dispatch(setActiveStep(0));
+              dispatch(setTwoFactorAddress(null));
+              dispatch(setName(""));
+              dispatch(setGuardians([{ name: "", address: "" }]));
+            }}
+          >
+            Step into your Krypton
+          </Button>
         </div>
       )}
 
@@ -149,21 +239,16 @@ export default function Step4() {
             Error Deploying Krypton
           </div>
 
-          <Button size="lg" className="w-full">
+          <Button
+            size="lg"
+            className="w-full"
+            onClick={() => {
+              setIsError(false);
+              setIsDeploying(true);
+              execute();
+            }}
+          >
             Try Again
-          </Button>
-        </div>
-      )}
-
-      {isDeployed && (
-        <div className="mt-5 flex flex-col w-full justify-center items-center gap-4">
-          <div className="font-uni flex items-center gap-2 text-lg">
-            Krypton Deployed
-            <CheckIcon className="text-black w-5 h-5 animate-bounce" />
-          </div>
-
-          <Button color="lightBlue" size="lg" className="w-full">
-            Step into your Krypton
           </Button>
         </div>
       )}

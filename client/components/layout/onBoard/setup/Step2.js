@@ -1,14 +1,16 @@
-'use client';
-import { ButtonGroup, Input, Button } from '@material-tailwind/react';
-import { useDispatch, useSelector } from 'react-redux';
-import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
+"use client";
+import { ButtonGroup, Input, Button } from "@material-tailwind/react";
+import { useDispatch, useSelector } from "react-redux";
+import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import {
   addGuardian,
   editGuardianAddress,
   editGuardianName,
   removeGuardian,
   setActiveStep,
-} from '@/redux/slice/setupSlice';
+} from "@/redux/slice/setupSlice";
+import toast from "react-hot-toast";
+import { useAccount } from "wagmi";
 
 function Guardian({ index, name, address }) {
   const dispatch = useDispatch();
@@ -20,7 +22,7 @@ function Guardian({ index, name, address }) {
         placeholder="Guardian Name"
         className=" !border-t-blue-gray-200 focus:!border-t-gray-900 -my-2"
         labelProps={{
-          className: 'before:content-none after:content-none',
+          className: "before:content-none after:content-none",
         }}
         value={name}
         onChange={(e) => {
@@ -32,7 +34,7 @@ function Guardian({ index, name, address }) {
         placeholder="Wallet Address"
         className=" !border-t-blue-gray-200 focus:!border-t-gray-900 -my-3"
         labelProps={{
-          className: 'before:content-none after:content-none',
+          className: "before:content-none after:content-none",
         }}
         value={address}
         onChange={(e) => {
@@ -45,6 +47,7 @@ function Guardian({ index, name, address }) {
 
 export default function Step2() {
   const guardians = useSelector((state) => state.setup.guardians);
+  const { address } = useAccount();
   const dispatch = useDispatch();
   return (
     <div className="w-full flex flex-col gap-4">
@@ -60,7 +63,7 @@ export default function Step2() {
         <ButtonGroup>
           <Button
             onClick={() => {
-              dispatch(addGuardian({ name: '', address: '' }));
+              dispatch(addGuardian({ name: "", address: "" }));
             }}
             disabled={guardians.length === 3}
           >
@@ -93,6 +96,42 @@ export default function Step2() {
           size="md"
           className="capitalize font-uni font-bold"
           onClick={() => {
+            if (guardians[0].name === "" || guardians[0].address === "") {
+              toast.error("Please fill at least one guardian");
+              return;
+            }
+
+            let isFilled = true;
+            let isValid = true;
+            let isOwner = false;
+
+            guardians.map((guardian) => {
+              if (guardian.name === "" || guardian.address === "") {
+                isFilled = false;
+              }
+              if (!guardian.address.match(/^0x[a-fA-F0-9]{40}$/)) {
+                isValid = false;
+              }
+              if (guardian.address === address) {
+                isOwner = true;
+              }
+            });
+
+            if (!isFilled) {
+              toast.error("Please fill all the guardians");
+              return;
+            }
+
+            if (!isValid) {
+              toast.error("Please enter a valid address");
+              return;
+            }
+
+            if (isOwner) {
+              toast.error("You must not be a guardian");
+              return;
+            }
+
             dispatch(setActiveStep(2));
           }}
         >

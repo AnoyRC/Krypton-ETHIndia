@@ -1,16 +1,16 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const walletSlice = createSlice({
-  name: 'wallet',
+  name: "wallet",
 
   initialState: {
-    status: 'Good',
+    status: "Good",
     isOwner: false,
     isGuardian: false,
     is2FA: false,
-    fnName: '',
+    fnName: "",
     fnArgs: [],
-    successMessage: '',
+    successMessage: "",
     twoFactorCooldown: 0,
     recentTwoFactor: 0,
   },
