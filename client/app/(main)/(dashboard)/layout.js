@@ -1,4 +1,4 @@
-import DashboardHolder from "@/components/layout/main/DashboardHolder";
+import DashboardHolder from "@/components/layout/main/dashboard/DashboardHolder";
 import Navbar from "@/components/layout/main/dashboard/Navbar";
 
 export const metadata = {
