@@ -1,6 +1,6 @@
-import GuardianHolder from "@/components/layout/guardian/GuardianHolder";
-import Navbar from "@/components/layout/guardian/Navbar";
-import StatusProvider from "@/providers/StatusProvider";
+import GuardianHolder from '@/components/layout/guardian/GuardianHolder';
+import Navbar from '@/components/layout/guardian/Navbar';
+import StatusProvider from '@/provider/StatusProvider';
 
 export const metadata = {
   title: 'Krypton | Login',

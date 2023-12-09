@@ -1,6 +1,6 @@
 import DashboardHolder from '@/components/layout/main/dashboard/DashboardHolder';
 import Navbar from '@/components/layout/main/dashboard/Navbar';
-import StatusProvider from '@/providers/StatusProvider';
+import StatusProvider from '@/provider/StatusProvider';
 
 export const metadata = {
   title: 'Krypton',

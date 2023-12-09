@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import { ChainConfig } from '@/lib/ChainConfig';
-import KryptonProxyFactory from '@/lib/contracts/KryptonProxyFactory';
-import { useEthersSigner } from '@/wagmi/EthersSigner';
-import { ethers } from 'ethers';
+import { ChainConfig } from "@/lib/chainConfig";
+import KryptonProxyFactory from "@/lib/contracts/KryptonProxyFactory";
+import { useEthersSigner } from "@/wagmi/EthersSigner";
+import { ethers } from "ethers";
 import {
   bundlerActions,
   getSenderAddress,
   signUserOperationHashWithECDSA,
-} from 'permissionless';
-import { useSelector } from 'react-redux';
-import { concat, createClient, createPublicClient, http } from 'viem';
-import { useAccount, useNetwork, useWalletClient } from 'wagmi';
+} from "permissionless";
+import { useSelector } from "react-redux";
+import { concat, createClient, createPublicClient, http } from "viem";
+import { useAccount, useNetwork, useWalletClient } from "wagmi";
 import {
   pimlicoBundlerActions,
   pimlicoPaymasterActions,
-} from 'permissionless/actions/pimlico';
-import toast from 'react-hot-toast';
-import { useEthersProvider } from '@/wagmi/EthersProvider';
+} from "permissionless/actions/pimlico";
+import toast from "react-hot-toast";
+import { useEthersProvider } from "@/wagmi/EthersProvider";
 
 export default function useDeployKrypton() {
   const signer = useEthersSigner();
@@ -38,7 +38,7 @@ export default function useDeployKrypton() {
       );
 
       if (!currentConfig) {
-        toast.error('Network not supported');
+        toast.error("Network not supported");
         return false;
       }
 
@@ -78,7 +78,7 @@ export default function useDeployKrypton() {
 
       const initCode = concat([
         factory.address,
-        factory.interface.encodeFunctionData('createAccount', [
+        factory.interface.encodeFunctionData("createAccount", [
           address,
           guardiansAddresses,
           guardiansAddresses.length,
@@ -91,7 +91,7 @@ export default function useDeployKrypton() {
         entryPoint: ENTRY_POINT_ADDRESS,
       });
 
-      const callData = '0x';
+      const callData = "0x";
 
       const gasPrice = await bundlerClient.getUserOperationGasPrice();
 
@@ -104,7 +104,7 @@ export default function useDeployKrypton() {
         maxPriorityFeePerGas: gasPrice.fast.maxPriorityFeePerGas,
         // dummy signature, needs to be there so the SimpleAccount doesn't immediately revert because of invalid signature length
         signature:
-          '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c',
+          "0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c",
       };
 
       const sponsorUserOperationResult =
@@ -122,7 +122,7 @@ export default function useDeployKrypton() {
       };
 
       console.log(
-        'Received paymaster sponsor result:',
+        "Received paymaster sponsor result:",
         sponsorUserOperationResult
       );
 
@@ -135,36 +135,36 @@ export default function useDeployKrypton() {
       });
       sponsoredUserOperation.signature = signature;
 
-      console.log('Generated signature:', signature);
+      console.log("Generated signature:", signature);
 
       const userOperationHash = await bundlerClient.sendUserOperation({
         userOperation: sponsoredUserOperation,
         entryPoint: ENTRY_POINT_ADDRESS,
       });
 
-      console.log('Received User Operation hash:', userOperationHash);
+      console.log("Received User Operation hash:", userOperationHash);
 
       // let's also wait for the userOperation to be included, by continually querying for the receipts
-      console.log('Querying for receipts...');
+      console.log("Querying for receipts...");
       const receipt = await bundlerClient.waitForUserOperationReceipt({
         hash: userOperationHash,
       });
       const txHash = receipt.receipt.transactionHash;
-      console.log('User Operation included in transaction', txHash);
+      console.log("User Operation included in transaction", txHash);
 
-      toast.success('Krypton deployed successfully');
+      toast.success("Krypton deployed successfully");
 
       return senderAddress;
     } catch (e) {
       console.log(e);
-      toast.error('Error deploying Krypton');
+      toast.error("Error deploying Krypton");
       return false;
     }
   };
 
   const checkWalletCode = async (address) => {
     const walletCode = await provider.getCode(address);
-    const walletExists = walletCode !== '0x';
+    const walletExists = walletCode !== "0x";
     return walletExists;
   };
 

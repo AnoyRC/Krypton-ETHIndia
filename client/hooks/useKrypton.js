@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { ChainConfig } from '@/lib/ChainConfig';
-import { ethers } from 'ethers';
-import { bundlerActions, signUserOperationHashWithECDSA } from 'permissionless';
-import { useSelector } from 'react-redux';
-import { createClient, createPublicClient, http } from 'viem';
-import { useAccount, useNetwork, useWalletClient } from 'wagmi';
+import { ChainConfig } from "@/lib/chainConfig";
+import { ethers } from "ethers";
+import { bundlerActions, signUserOperationHashWithECDSA } from "permissionless";
+import { useSelector } from "react-redux";
+import { createClient, createPublicClient, http } from "viem";
+import { useAccount, useNetwork, useWalletClient } from "wagmi";
 import {
   pimlicoBundlerActions,
   pimlicoPaymasterActions,
-} from 'permissionless/actions/pimlico';
-import toast from 'react-hot-toast';
-import useDeployKrypton from './useDeployKrypton';
-import { useEthersSigner } from '@/wagmi/EthersSigner';
-import Krypton from '@/lib/contracts/Krypton';
-import useReadContract from './useReadContract';
+} from "permissionless/actions/pimlico";
+import toast from "react-hot-toast";
+import useDeployKrypton from "./useDeployKrypton";
+import { useEthersSigner } from "@/wagmi/EthersSigner";
+import Krypton from "@/lib/contracts/Krypton";
+import useReadContract from "./useReadContract";
 
 export default function useKrypton() {
   const { chain: currentChain } = useNetwork();
@@ -28,16 +28,16 @@ export default function useKrypton() {
     walletAddress,
     chain,
     fnCallData,
-    successMessage = 'Transaction executed successfully'
+    successMessage = "Transaction executed successfully"
   ) => {
     try {
       const ENTRY_POINT_ADDRESS = process.env.NEXT_PUBLIC_ENTRY_POINT_ADDRESS;
       const apiKey = process.env.NEXT_PUBLIC_PIMLICO_APIKEY;
 
-      let chainName = '';
+      let chainName = "";
 
-      if (chain === '80001') {
-        chainName = 'mumbai';
+      if (chain === "80001") {
+        chainName = "mumbai";
       }
 
       const currentConfig = ChainConfig.find(
@@ -45,14 +45,14 @@ export default function useKrypton() {
       );
 
       if (!currentConfig) {
-        toast.error('Chain not supported');
+        toast.error("Chain not supported");
         return false;
       }
 
       const walletCode = await checkWalletCode(walletAddress);
 
       if (!walletCode) {
-        toast.error('Wallet not deployed');
+        toast.error("Wallet not deployed");
         return false;
       }
 
@@ -78,14 +78,14 @@ export default function useKrypton() {
         chain: currentChain,
       }).extend(pimlicoPaymasterActions);
 
-      const initCode = '0x';
+      const initCode = "0x";
 
       const callData = fnCallData;
 
       const nonce = await publicClient.readContract({
         address: walletAddress,
         abi: Krypton.abi,
-        functionName: 'getNonce',
+        functionName: "getNonce",
       });
 
       const gasPrice = await bundlerClient.getUserOperationGasPrice();
@@ -99,7 +99,7 @@ export default function useKrypton() {
         maxPriorityFeePerGas: gasPrice.fast.maxPriorityFeePerGas,
         // dummy signature, needs to be there so the SimpleAccount doesn't immediately revert because of invalid signature length
         signature:
-          '0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c',
+          "0xa15569dd8f8324dbeabf8073fdec36d4b754f53ce5901e283c6de79af177dc94557fa3c9922cd7af2a96ca94402d35c39f266925ee6407aeb32b31d76978d4ba1c",
       };
 
       const sponsorUserOperationResult =
@@ -117,7 +117,7 @@ export default function useKrypton() {
       };
 
       console.log(
-        'Received paymaster sponsor result:',
+        "Received paymaster sponsor result:",
         sponsorUserOperationResult
       );
 
@@ -130,22 +130,22 @@ export default function useKrypton() {
       });
       sponsoredUserOperation.signature = signature;
 
-      console.log('Generated signature:', signature);
+      console.log("Generated signature:", signature);
 
       const userOperationHash = await bundlerClient.sendUserOperation({
         userOperation: sponsoredUserOperation,
         entryPoint: ENTRY_POINT_ADDRESS,
       });
 
-      console.log('Received User Operation hash:', userOperationHash);
+      console.log("Received User Operation hash:", userOperationHash);
 
       // let's also wait for the userOperation to be included, by continually querying for the receipts
-      console.log('Querying for receipts...');
+      console.log("Querying for receipts...");
       const receipt = await bundlerClient.waitForUserOperationReceipt({
         hash: userOperationHash,
       });
       const txHash = receipt.receipt.transactionHash;
-      console.log('User Operation included in transaction', txHash);
+      console.log("User Operation included in transaction", txHash);
 
       toast.success(successMessage);
 
@@ -155,7 +155,7 @@ export default function useKrypton() {
       return true;
     } catch (e) {
       console.log(e);
-      toast.error('Error executing transaction');
+      toast.error("Error executing transaction");
       return false;
     }
   };
@@ -171,7 +171,7 @@ export default function useKrypton() {
     );
 
     const functionCallData = KryptonContract.interface.encodeFunctionData(
-      'enableTwoFactorAuth',
+      "enableTwoFactorAuth",
       [twoFactorAddress]
     );
 
