@@ -32,11 +32,6 @@ export default function Navbar() {
       link: `/transfer?wallet=${searchParams.get("wallet")}`,
     },
     {
-      title: "Swap",
-      description: "Swap your tokens for another.",
-      link: `/swap?wallet=${searchParams.get("wallet")}`,
-    },
-    {
       title: "Tokens",
       description: "View all of your tokens.",
       link: `/tokens?wallet=${searchParams.get("wallet")}`,
