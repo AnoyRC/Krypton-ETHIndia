@@ -8,6 +8,10 @@ const ChatBackground = () => {
       <section className="flex justify-center h-full items-center flex-col">
         <Image src="/images/logo.png" alt="logo" width={100} height={100} />
 
+        {/* <h3 className="text-primary-white/60 font-bold text-2xl leading-normal">
+          Krypton
+        </h3> */}
+
         <p className="text-primary-white/60 max-w-xs text-center mt-5">
           Send and receive messages anytime to your contacts
         </p>

@@ -1,10 +1,20 @@
 'use client';
 
 import Image from 'next/image';
+import { useRef } from 'react';
+import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { setMessages } from '@/redux/slice/contactsSlice';
+
+import MessageWithDate from './MessageWithDate';
+
 const Chat = () => {
+  const dispatch = useDispatch();
+
+  // const messagesContainerRef = useRef(null);
+
   const [loading, setLoading] = useState(true);
 
   const pushSign = useSelector((state) => state.contacts.pushSign);
@@ -12,7 +22,28 @@ const Chat = () => {
   const currentContact = useSelector((state) => state.contacts.currentContact);
 
   const initializeChat = async () => {
-    return true;
+    try {
+      const pastMessages = await pushSign.chat.history(
+        currentContact.did.split(':')[1],
+        {
+          limit: 25,
+        }
+      );
+
+      const filteredMessages = pastMessages.map(
+        ({ fromDID, timestamp, messageContent, messageType }) => ({
+          fromDID,
+          timestamp,
+          messageContent,
+          messageType,
+        })
+      );
+
+      dispatch(setMessages([...filteredMessages].reverse()));
+      setLoading(false);
+    } catch (err) {
+      toast.error('Error fetching chat history');
+    }
   };
 
   useEffect(() => {
@@ -21,6 +52,13 @@ const Chat = () => {
       initializeChat();
     }
   }, [currentContact, pushSign]);
+
+  // useEffect(() => {
+  //   if (messagesContainerRef.current) {
+  //     const { scrollHeight } = messagesContainerRef.current;
+  //     messagesContainerRef.current.scrollTo(0, scrollHeight);
+  //   }
+  // }, [messageHistory]);
 
   return (
     <div className="mb-6 flex-1 relative font-uni">
@@ -42,7 +80,16 @@ const Chat = () => {
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-1 z-10">Hello</div>
+        <div className="flex flex-col gap-1 z-10">
+          {messageHistory.map((message, index, arr) => (
+            <MessageWithDate
+              key={index}
+              index={index}
+              message={message}
+              nextMessage={arr[index + 1]}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
