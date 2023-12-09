@@ -3,28 +3,47 @@
 import { Button } from '@material-tailwind/react';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
+import Image from 'next/image';
+import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+
 const RequestsItem = ({ request, initializeRequests }) => {
-  const pubKey = '0xRioedflksfjiesjfisfkjgklsjrj2';
+  const pubKey = request.did.split(':')[1];
+
+  const pushSign = useSelector((state) => state.contacts.pushSign);
 
   const handleAcceptRequest = async () => {
-    console.log('accept request');
+    await pushSign.chat.accept(pubKey);
+
+    initializeRequests();
+    toast.success('Request accepted');
   };
 
   const handleRejectRequest = async () => {
-    console.log('reject request');
+    await pushSign.chat.reject(pubKey);
+
+    initializeRequests();
+    toast.success('Request rejected');
   };
 
   return (
     <div className="flex justify-between border-b borde-gray-200 px-2 py-3 hover:bg-gray-50">
       <div className="flex items-center">
-        <div className="w-10 h-10 rounded-full mr-3 overflow-hidden bg-red-200"></div>
+        <div className="w-10 h-10 rounded-full mr-3 overflow-hidden">
+          <Image
+            src={request.profilePicture}
+            width={40}
+            height={40}
+            alt="Profile"
+          />
+        </div>
 
         <div>
           <h3 className="text-base font-bold text-black">
             {pubKey.slice(0, 6)}...{pubKey.slice(-4)}
           </h3>
 
-          <p className="text-xs">gjdfjkfgdk</p>
+          <p className="text-xs">{request.msg.messageContent}</p>
         </div>
       </div>
 

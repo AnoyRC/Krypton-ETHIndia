@@ -1,91 +1,33 @@
 'use client';
 
-import { ethers } from 'ethers';
-import { useState } from 'react';
+import { useAccount } from 'wagmi';
+import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useEthersSigner } from '@/wagmi/EthersSigner';
 
 import ContactsItem from './ContactsItem';
 
 const Contacts = () => {
-  const signer = ethers.Wallet.createRandom();
+  const signer = useEthersSigner();
+  const { isConnected } = useAccount();
 
-  const [chats, setChats] = useState([
-    {
-      chatId:
-        '6168440929ced5109c50534d40bb98a5e109ebf1d33df966ae898f002fac8973',
-      about: null,
-      did: 'eip155:0x14727F96dF61105661E78275D1A03C4F8aeff562',
-      intent: 'eip155:0x14727F96dF61105661E78275D1A03C4F8aeff562',
-      intentSentBy: 'eip155:0x14727F96dF61105661E78275D1A03C4F8aeff562',
-      intentTimestamp: '2023-08-29T08:05:03.000Z',
-      publicKey:
-        '{"key":"-----BEGIN PGP PUBLIC KEY BLOCK-----\\n\\nxsBNBGTt9AcBCADXjt9OEXDQyE7w2veaHqTUN9fALt7c+cubz2nhWfmD07M1\\n5Spm3ScT/4HdlPpUBYnGUKlCT09g663RvvmDzp8442vZhfYeKbetrcNFxfnp\\n+ePQGiLDY0h2FmjQGkmZGP43ZLyhNT4eCIGPcPSpzaWAKw4wgE/tW2hli5m/\\n7e8HFno+bHp2ycNoPJpdqhY77CJL9zPqFdctCPxI5r1/+xkVLcf+NZ+vD7mz\\nq8xVpu3Tij5Jb5ShDPQ3qqPsqdCcB/fpnEtAOT/Ryuf5Qqic/bDrzImfaIO9\\nYmdnuc6uQBR1s8WbLHmOsQvJhe2D8MtggV5HwHbkPqxXBmpGIJnMeLHZABEB\\nAAHNAMLAigQQAQgAPgWCZO30BwQLCQcICZBvKHl019glPAMVCAoEFgACAQIZ\\nAQKbAwIeARYhBEyKE1gcoT4IIxerrG8oeXTX2CU8AADltgf/dREUaHmfMnwa\\nWwcoGxfya7xeSeqGLWoWsCDg55lq0rf59IFKw59AKL+4kKQrmVDW0x6oo844\\nxBv3NBq7OssNbRr4XYIXJN4oP8g0SdOYinTTcnHFjJcRHfTIa+lmlf7fwc7d\\n2DRW3Kyu66OGq9sLzcgI3Q4Fg3VOQGRDdVGF4zJGjPEpnHsJuGCVnbn5L94p\\nMZHEMIahYrYg2asglSByNUZIH+r0Y8rCzKp8rs37X/Q8RBrmW/oTnE/bb+xo\\n1jHgRR3MUs2Ea0oAqv/TwqpBRzMIWQ8tGKfEaJ22p02FJaE5q9KMbLp0mMIe\\nd33xGwOezLKoK5L9cHKg7wmz4sWvUs7ATQRk7fQHAQgApXcZbj43S5sr7v8d\\nq9JwcXkSdpRuzGw5zyauxUUElq2RLKPvsP8En+OJQceKWQcpvz16xLjnSoZI\\nfgIl1wXUaEb2T45rUrWmnoO+Csy2h6FePNmlHOerY2/C0GHQX3XP/B0t41By\\nG/o4losESsBaHEYugHIg5kXhgsGnlgoC3Bu4zHFmIvLlZXjCWYUG2JnhNHlG\\nrD67/Xuox1FO+Hh/rR7sSsWIH6S+SFgG/P4bwiW0JAYQP6bC4tbXfzvKJk2R\\ndeySnppEAwdn/3lCU5QscYIIUXSaPoV3Q6hg+wRigBk2ixkqdOTJmJROTOo3\\nUdnaeGSwP23USJIUncZWgcIokwARAQABwsB2BBgBCAAqBYJk7fQHCZBvKHl0\\n19glPAKbDBYhBEyKE1gcoT4IIxerrG8oeXTX2CU8AABx6Af/XRamjQ4T79rf\\nhNArQt3VuHvpIUP860MCg0aW5rMtZ8q4+TwOyjiEgOUIFx215Yprb3R3NTKV\\nQWJr8n++ZGDmQ8iro8nrRMRELmoEJzyWp3yr0dyr2lx01//bud+vVw+ARPLt\\nVUnX8eguLKRrltQmIRwCqX01PCTiN2RDB2Akd+zlBGRiHoavW9dDdGGBY9wW\\nA2Pyw73BeMzVA3akiGzLsdRIshO0DBALaX0G5ytqyIf3QjXOqO6C7gp9XW7R\\njXhRhzvR9NjZPmSXEeYqYw2CUPxzaLsKoSP4dbXE7Hl+sYJptzke7LE1StzH\\nG64gRgEYMCKvRZaPXYnPJXAZwDhijw==\\n=8aQd\\n-----END PGP PUBLIC KEY BLOCK-----\\n","signature":"DEPRECATED"}',
-      profilePicture:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAsklEQVR4AcXBQY0DMRBE0Z+SCRhCsBhGAJiAYQwBgzGmZuDk2pPDSKPsqt57zNfzTVKPxX+K0ciEmTATZqXuSRajkdVjkcVoXKnHIovRyOqeZMJMmAmzEurcUffkF6FOJsyEmTAr3BTqXKks7hBmwkyYFb7UPflLdU+yUCcTZsJMmBW+hDong5O6J1diNE7EJWEmzIRZqccii9G4Eur8oh6LTJgJM2H2mK/nGyNhJsyE2QfJZChdHLm7QQAAAABJRU5ErkJggg==',
-      threadhash: 'bafyreiewla5iyd7rnvjw2c5w6dbab4zkyf2desbowzouijoea2jzakxz6i',
-      wallets: 'eip155:0x14727F96dF61105661E78275D1A03C4F8aeff562',
-      combinedDID:
-        'eip155:0x14727F96dF61105661E78275D1A03C4F8aeff562_eip155:0x84a9385e9b97df87b80c2e689997133703853874',
-      name: null,
-      groupInformation: null,
-      msg: {
-        fromDID: 'eip155:0x14727F96dF61105661E78275D1A03C4F8aeff562',
-        toDID: 'eip155:0x84a9385e9b97df87b80c2e689997133703853874',
-        messageObj: [Object],
-        messageContent: 'Hello Alice!',
-        messageType: 'Text',
-        timestamp: 1693316103747,
-        fromCAIP10: 'eip155:0x14727F96dF61105661E78275D1A03C4F8aeff562',
-        toCAIP10: 'eip155:0x84a9385e9b97df87b80c2e689997133703853874',
-        encryptedSecret:
-          '-----BEGIN PGP MESSAGE-----\n' +
-          '\n' +
-          'wcBMA3d9z8TNUuddAQf/U2hMcybh5mUt9FFen5tfZ52PaB0vc2G+wYYIsBfu\n' +
-          'zg58rgLy8uGMxvzhtCWhpIE91G62d8M4OmaDa+PLjs8SqyRoyih/9pt8P4cw\n' +
-          'UJVHHDcJNC9r6/AV4aZySdz5u5utE7o3iB1FU0Sr9HEQsImmOM7J6LZJ3xWJ\n' +
-          'V+o4ToLbqUFYKg2uY1kUXpyX+D6JRinagnAosh4zCICLUqrEkKNqbyV2mr+5\n' +
-          'FK+fClWBGCwpf38L220FqHYPQ4bQXks0N07yW4OVjVpCTZVuNttr7PIEqcyZ\n' +
-          'qIovbQbkltiDpsb/yYysEHTwBtvugna7xMW7SRY34x3iWm/HBNJmfBG7LnjI\n' +
-          '6cHATAMrTKobmmcFTAEH/20nW6aNzfj1vn/5GIWjZ5Z4Rw6G3Syt+0NxPUix\n' +
-          'dpKIFOR0/BEJkafGMdlk/vRElsyluKbzykBlIQ0hHGRpGMNEW8s8GrJeiXvV\n' +
-          'JSNZ24u5DDk8DIBaJWJnyWM7XzgcmOmn9rvVbvc9qgNNgtDeMIZwUpiDipnA\n' +
-          '++7n72h0JSs8dWFQ62FSf5ACHC0UVbPiL3TRrRBEo7vQp4JsJyXp70CUclqU\n' +
-          '3ANLvNhINV6GGtpXEKnsBVkkg35HR92nIzk+8HL86SsRUYfXkufzXdkPpmRn\n' +
-          'SG7MoDecNf/bwoqP8/l2X2h3R1c+WTQFb6Z+eK/NsJ/AnSErFZh3yEHAi1Rz\n' +
-          'yIXSQAEA2KupLnBVC9fqZqhUySvOW/Hs/hD6iEEGIl+U/RC9AwdG2jpg4sVi\n' +
-          'f9PhBJ5Tanynb3aHngRKtIzjP5m223A=\n' +
-          '=5w+B\n' +
-          '-----END PGP MESSAGE-----\n',
-        encType: 'pgp',
-        signature:
-          '-----BEGIN PGP SIGNATURE-----\n' +
-          '\n' +
-          'wsBzBAEBCAAnBYJk7fQHCZBvKHl019glPBYhBEyKE1gcoT4IIxerrG8oeXTX\n' +
-          '2CU8AACRLQf/bbeJoUNwRkJYz100R3ULO27HGjKnFeOaMZWRNF8JqWzNmCBL\n' +
-          'Cj3aIBkDuCUj7avBsanScbSa7tD8Mc8PZgpSkd22nNH5iHiDJqlPtySJ2KoZ\n' +
-          '3ekVXfOgfLlHtN78ghTxABewYQRuB6kwtv3XQW8X9sCL2jEF4NIIl5eXZvIT\n' +
-          'nhbHhhOR47k2E0hiHjPv2t3ggrwkrw6ISDgV8qYcrnf7vEFeGHpeSc25QLJH\n' +
-          'pXCeeHhH7h4C9L3PEdMt8T+Ne36cfNiwTGdOavin/yfNES6k0kqZxP44hn1M\n' +
-          'ZBk4jfyaDUh70mv4FtxdPcdb1TGQsPC1YYAIh/059EBqkdJFhVF4+A==\n' +
-          '=DBch\n' +
-          '-----END PGP SIGNATURE-----\n',
-        sigType: 'pgpv2',
-        verificationProof:
-          'pgpv2:-----BEGIN PGP SIGNATURE-----\n' +
-          '\n' +
-          'wsBzBAEBCAAnBYJk7fQHCZBvKHl019glPBYhBEyKE1gcoT4IIxerrG8oeXTX\n' +
-          '2CU8AADsmwf/UpJCmnqztJLt1Ltg0OD7xoDvumitRwkfhnXzUdBWxM3i7vj4\n' +
-          'cfjtcpQI2R5W0TXj9e2fymimIc98kjUqpDiUIaVAuD0OnEbJdIluGLBTJeks\n' +
-          'YTRikqkgjFJT9Y6/2VRQj59IR0rgC0sec8mSKPlxuhixkdSS7Wec0+84cGmX\n' +
-          'aieskReKeitKacYkU4Uf82Klc7Ft8+duBsaMGR3TS22PzHfYIHmy+8Z3b1SK\n' +
-          'pMyJ8NBXCG2F+05WdoUsXBR+lO74RjSDWnWZlgRngWjjvSXQuZ/QznIyBVmQ\n' +
-          'oOxJM5LSCCwH6ch5J/HmXudJG+3wsCINchvSQx0LntZUoeSp8cezvg==\n' +
-          '=KUqZ\n' +
-          '-----END PGP SIGNATURE-----\n',
-        link: null,
-      },
-    },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [chats, setChats] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const pushSign = useSelector((state) => state.contacts.pushSign);
+  const recentContact = useSelector((state) => state.contacts.recentContact);
+
+  useEffect(() => {
+    const initializeChats = async () => {
+      const chatsLists = await pushSign.chat.list('CHATS');
+      setChats(chatsLists);
+      setIsLoading(false);
+    };
+
+    if (isConnected && signer && pushSign) {
+      initializeChats();
+    }
+  }, [pushSign, isConnected, signer, recentContact]);
 
   return (
     <div className="relative flex-1">
