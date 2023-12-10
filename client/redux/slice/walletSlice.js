@@ -60,6 +60,7 @@ export const {
   setSuccessMessage,
   setTwoFactorCooldown,
   setRecentTwoFactor,
+  setOwner
 } = walletSlice.actions;
 
 export default walletSlice.reducer;
