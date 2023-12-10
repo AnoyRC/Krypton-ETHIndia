@@ -1,6 +1,6 @@
 "use client";
 
-import { ChainConfig } from "@/lib/chainConfig";
+import { ChainConfig } from "@/lib/ChainConfig";
 import KryptonProxyFactory from "@/lib/contracts/KryptonProxyFactory";
 import { useEthersSigner } from "@/wagmi/EthersSigner";
 import { ethers } from "ethers";

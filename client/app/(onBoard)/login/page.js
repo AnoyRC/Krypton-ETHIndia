@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   CardHeader,
@@ -6,21 +6,24 @@ import {
   CardFooter,
   Typography,
   Button,
-} from '@material-tailwind/react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { useAccount, useConnect } from 'wagmi';
+} from "@material-tailwind/react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useAccount, useConnect } from "wagmi";
 
 export default function Login() {
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const { isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
 
   useEffect(() => {
+   
     if (isConnected) {
-      router.push('/wallet');
+      router.push("/wallet");
     }
   }, [isConnected]);
 
@@ -55,7 +58,7 @@ export default function Login() {
               Sign In with Social
             </Button>
             <div className="flex w-full justify-end items-center text-black -my-2">
-              Powered by{' '}
+              Powered by{" "}
               <Image
                 src="/images/onboard/login/auth0.svg"
                 width={15}
@@ -128,8 +131,8 @@ export default function Login() {
       {!isConnected && (
         <CardFooter className="flex flex-col gap-4 -mt-7 text-center">
           <Typography color="gray">
-            By connecting you agree to our{' '}
-            <span className="text-blue-500">Terms of Service</span> and{' '}
+            By connecting you agree to our{" "}
+            <span className="text-blue-500">Terms of Service</span> and{" "}
             <span className="text-blue-500">Privacy Policy</span>
           </Typography>
         </CardFooter>

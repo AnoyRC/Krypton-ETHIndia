@@ -1,5 +1,5 @@
 const Krypton = {
-  address: "0xb372cea5Bf97Eab2A9D86686d2d5feC5F0CcB298",
+  address: "0xE22E6Bfe453D0aC0E8Be402C0D349Ae15ac0F9C3",
   abi: [
     {
       inputs: [
@@ -37,6 +37,19 @@ const Krypton = {
         {
           indexed: true,
           internalType: "address",
+          name: "by",
+          type: "address",
+        },
+      ],
+      name: "AvailabilityTimePeriodChanged",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
           name: "beacon",
           type: "address",
         },
@@ -61,6 +74,32 @@ const Krypton = {
         },
       ],
       name: "GuardianAdded",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "by",
+          type: "address",
+        },
+      ],
+      name: "GuardianAvailabilityChecked",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "guardian",
+          type: "address",
+        },
+      ],
+      name: "GuardianAvailable",
       type: "event",
     },
     {
@@ -384,6 +423,24 @@ const Krypton = {
     {
       inputs: [
         {
+          internalType: "uint256",
+          name: "_days",
+          type: "uint256",
+        },
+        {
+          internalType: "bytes",
+          name: "signature",
+          type: "bytes",
+        },
+      ],
+      name: "changeAvalabilityTimePeriod",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
           internalType: "address",
           name: "_newTwoFactorOwner",
           type: "address",
@@ -526,6 +583,24 @@ const Krypton = {
         },
       ],
       name: "executeBatch",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address[]",
+          name: "guardianList",
+          type: "address[]",
+        },
+        {
+          internalType: "bytes",
+          name: "signature",
+          type: "bytes",
+        },
+      ],
+      name: "executeGuardianAvailabilityCheck",
       outputs: [],
       stateMutability: "nonpayable",
       type: "function",
@@ -714,6 +789,25 @@ const Krypton = {
           internalType: "bool",
           name: "isUsed",
           type: "bool",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      name: "guardianToRemoveTimestamp",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
         },
       ],
       stateMutability: "view",
@@ -967,6 +1061,13 @@ const Krypton = {
         },
       ],
       stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "supportAvailability",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
     {
@@ -1268,12 +1369,14 @@ const Krypton = {
     addGuardian: "contracts/base/GuardianManager.sol",
     cancelGuardianshipTransfer: "contracts/base/GuardianManager.sol",
     cancelRecovery: "contracts/base/GuardianManager.sol",
+    changeAvalabilityTimePeriod: "contracts/base/GuardianManager.sol",
     changeTwoFactorAuth: "contracts/base/GuardianManager.sol",
     changeTwoFactorCooldown: "contracts/base/GuardianManager.sol",
     currRecoveryRound: "contracts/base/GuardianManager.sol",
     editThreshold: "contracts/base/GuardianManager.sol",
     enableTwoFactorAuth: "contracts/base/GuardianManager.sol",
     entryPoint: "contracts/base/GuardianManager.sol",
+    executeGuardianAvailabilityCheck: "contracts/base/GuardianManager.sol",
     executeGuardianshipTransfer: "contracts/base/GuardianManager.sol",
     executeRecovery: "contracts/base/GuardianManager.sol",
     getAllGuardians: "contracts/base/GuardianManager.sol",
@@ -1283,6 +1386,7 @@ const Krypton = {
     getTimeBasedMsg: "contracts/base/GuardianManager.sol",
     guardianChangeRequest: "contracts/base/GuardianManager.sol",
     guardianRecoveryRequest: "contracts/base/GuardianManager.sol",
+    guardianToRemoveTimestamp: "contracts/base/GuardianManager.sol",
     inGuardianRequest: "contracts/base/GuardianManager.sol",
     inRecovery: "contracts/base/GuardianManager.sol",
     initialize: "contracts/base/GuardianManager.sol",
@@ -1291,6 +1395,7 @@ const Krypton = {
     isTwoFactorEnabled: "contracts/base/GuardianManager.sol",
     owner: "contracts/base/GuardianManager.sol",
     recentTwoFactor: "contracts/base/GuardianManager.sol",
+    supportAvailability: "contracts/base/GuardianManager.sol",
     supportRecovery: "contracts/base/GuardianManager.sol",
     threshold: "contracts/base/GuardianManager.sol",
     transferGuardianship: "contracts/base/GuardianManager.sol",

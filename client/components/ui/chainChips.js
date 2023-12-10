@@ -11,19 +11,19 @@ export function MumbaiChip() {
 }
 
 export function ArbitrumChip() {
-  return <Chip value="Arbitrum" color="light-blue" className="w-fit" />;
+  return <Chip value="Arb Goerli" color="light-blue" className="w-fit" />;
 }
 
 export function CeloChip() {
-  return <Chip value="Celo" color="lime" className="w-fit" />;
+  return <Chip value="Alfajores" color="lime" className="w-fit" />;
 }
 
 export function BaseChip() {
-  return <Chip value="Base" color="blue" className="w-fit" />;
+  return <Chip value="Base Goerli" color="blue" className="w-fit" />;
 }
 
 export function ScrollChip() {
-  return <Chip value="Scroll" color="blue-gray" className="w-fit" />;
+  return <Chip value="Scroll Sepolia" color="blue-gray" className="w-fit" />;
 }
 
 export function UnsupportedChip() {
@@ -35,7 +35,16 @@ export function ChipsInId({ chain }) {
     <>
       {chain === "137" && <PolygonChip />}
       {chain === "80001" && <MumbaiChip />}
-      {chain !== "137" && chain !== "80001" && <UnsupportedChip />}
+      {chain === "84531" && <BaseChip />}
+      {chain === "44787" && <CeloChip />}
+      {chain === "534351" && <ScrollChip />}
+      {chain === "421613" && <ArbitrumChip />}
+      {chain !== "137" &&
+        chain !== "80001" &&
+        chain !== "84531" &&
+        chain !== "44787" &&
+        chain !== "534351" &&
+        chain !== "421613" && <UnsupportedChip />}
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChainConfig } from "@/lib/chainConfig";
+import { ChainConfig } from "@/lib/ChainConfig";
 import {
   closeMessageDrawer,
   setSignature,

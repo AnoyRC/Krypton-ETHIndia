@@ -1,5 +1,5 @@
 import Link from "next/link";
-import WalletMenu from "../main/dashboard/Navbar/WalletMenu";
+import WalletMenu from "../main/dashboard/navbar/WalletMenu";
 
 export default function Navbar() {
   return (
