@@ -44,6 +44,9 @@ const walletSlice = createSlice({
     setRecentTwoFactor: (state, action) => {
       state.recentTwoFactor = action.payload;
     },
+    setOwner: (state, action) => {
+      state.owner = action.payload;
+    },
   },
 });
 
