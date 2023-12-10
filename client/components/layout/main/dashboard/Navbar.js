@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import CustomMenu from "./Navbar/CustomMenu";
-import WalletMenu from "./Navbar/WalletMenu";
+import CustomMenu from "./navbar/CustomMenu";
+import WalletMenu from "./navbar/WalletMenu";
 import { useSearchParams } from "next/navigation";
 
 export default function Navbar() {
