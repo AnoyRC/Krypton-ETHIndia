@@ -1,5 +1,6 @@
 'use client';
 
+import { setUser } from '@/redux/slice/walletSlice';
 import {
   CardHeader,
   CardBody,
@@ -7,6 +8,7 @@ import {
   Typography,
   Button,
 } from '@material-tailwind/react';
+import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -16,11 +18,24 @@ import { useAccount, useConnect } from 'wagmi';
 export default function Login() {
   const router = useRouter();
 
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
 
   useEffect(() => {
+    const getCurrentUser = async () => {
+      await axios
+        .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/${address}`)
+        .then((res) => {
+          if (res.data) {
+            dispatch(setUser(res.data));
+          } else {
+            dispatch(setUser(null));
+          }
+        });
+    };
+
     if (isConnected) {
       router.push('/wallet');
+      getCurrentUser();
     }
   }, [isConnected]);
 

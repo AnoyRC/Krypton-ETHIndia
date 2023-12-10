@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Card } from "@material-tailwind/react";
-import Spline from "@splinetool/react-spline";
+import { Card } from '@material-tailwind/react';
+import Spline from '@splinetool/react-spline';
 
 export default function DashboardHolder({ children }) {
   return (

@@ -1,5 +1,6 @@
-"use client";
-import Spline from "@splinetool/react-spline";
+'use client';
+
+import Spline from '@splinetool/react-spline';
 
 export default function MainContent() {
   return (

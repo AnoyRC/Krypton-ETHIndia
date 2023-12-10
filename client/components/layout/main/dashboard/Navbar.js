@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import CustomMenu from "./navbar/CustomMenu";
-import WalletMenu from "./navbar/WalletMenu";
+import CustomMenu from "./Navbar/CustomMenu";
+import WalletMenu from "./Navbar/WalletMenu";
 import { useSearchParams } from "next/navigation";
 
 export default function Navbar() {
@@ -30,6 +30,11 @@ export default function Navbar() {
       title: "Transfer",
       description: "Transfer your funds to another wallet.",
       link: `/transfer?wallet=${searchParams.get("wallet")}`,
+    },
+    {
+      title: "Swap",
+      description: "Swap your tokens for another.",
+      link: `/swap?wallet=${searchParams.get("wallet")}`,
     },
     {
       title: "Tokens",
@@ -83,7 +88,7 @@ export default function Navbar() {
 
         <div className="flex items-center mt-2 ml-7">
           <Link
-            href={"#"}
+            href={`/home?wallet=${searchParams.get("wallet")}`}
             id=":RkrqukqH2:"
             variant="text"
             className="align-middle select-none text-center transition-all mr-4 disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none py-3 px-6 rounded-lg text-gray-900 hover:bg-gray-900/10 active:bg-gray-900/20 flex items-center gap-3 text-base font-normal capitalize tracking-normal font-uni outline-none"

@@ -5,28 +5,52 @@ import {
   Button,
   Dialog,
   Card,
+  CardHeader,
   CardBody,
   CardFooter,
+  Typography,
   Input,
+  Select,
+  Option,
+  Checkbox,
 } from '@material-tailwind/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import Image from 'next/image';
 import { CheckIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
+import { useAccount } from 'wagmi';
+import { PolygonChip, MumbaiChip } from '@/components/ui/chainChips';
 
 export function AddGuardianWalletDialog() {
   const guardianWalletDialog = useSelector(
     (state) => state.setup.guardianWalletDialog
   );
+  const [chain, setChain] = useState('137');
   const dispatch = useDispatch();
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [guardianWallet, setGuardianWallet] = useState('');
 
-  const demoCallback = () => {
-    setTimeout(() => {
-      setIsVerifying(false);
-      setIsVerified(true);
-    }, 2000);
+  const { address } = useAccount();
+
+  const addGuardian = async () => {
+    setIsVerifying(true);
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user/${address}/guardianWallet`,
+      {
+        walletAddress: address,
+        kryptonAddress: `${chain}:${guardianWallet}`,
+        guardianWallet: `${chain}:${guardianWallet}`,
+      }
+    );
+    setIsVerified(true);
+  };
+
+  const GuardianWalletDialog = () => {
+    dispatch(handleGuardianWalletDialog());
+    setIsVerified(false);
+    setIsVerifying(false);
   };
 
   return (
@@ -35,7 +59,7 @@ export function AddGuardianWalletDialog() {
         size="xs"
         open={guardianWalletDialog}
         handler={() => {
-          dispatch(handleGuardianWalletDialog());
+          GuardianWalletDialog();
         }}
         className="bg-transparent shadow-none"
       >
@@ -54,7 +78,33 @@ export function AddGuardianWalletDialog() {
                 labelProps={{
                   className: 'before:content-none after:content-none',
                 }}
+                value={guardianWallet}
+                setGuardianWallet={(e) => setGuardianWallet(e.target.value)}
               />
+              <Select
+                variant="static"
+                label=""
+                containerProps={{
+                  className: '-mt-5 mb-2',
+                }}
+                labelProps={{
+                  className: 'my-2',
+                }}
+                className="my-2"
+                animate={{
+                  mount: { y: 0 },
+                  unmount: { y: 25 },
+                }}
+                value={chain}
+                onChange={(e) => setChain(e)}
+              >
+                <Option value="80001">
+                  <MumbaiChip />
+                </Option>
+                <Option value="137">
+                  <PolygonChip />
+                </Option>
+              </Select>
             </CardBody>
           )}
           <CardFooter className="pt-0 -mt-3">
@@ -63,7 +113,7 @@ export function AddGuardianWalletDialog() {
                 size="lg"
                 onClick={() => {
                   setIsVerifying(true);
-                  demoCallback();
+                  addGuardian();
                 }}
                 fullWidth
               >
@@ -95,9 +145,7 @@ export function AddGuardianWalletDialog() {
                 <Button
                   size="lg"
                   onClick={() => {
-                    dispatch(handleGuardianWalletDialog());
-                    setIsVerified(false);
-                    setIsVerifying(false);
+                    GuardianWalletDialog();
                   }}
                   fullWidth
                   className="mt-3"

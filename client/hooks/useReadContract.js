@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { ChainConfig } from "@/lib/chainConfig";
-import Krypton from "@/lib/contracts/Krypton";
-import { setRecentTwoFactor } from "@/redux/slice/walletSlice";
-import { ethers } from "ethers";
-import { useSearchParams } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { ChainConfig } from '@/lib/ChainConfig';
+import Krypton from '@/lib/contracts/Krypton';
+import { setRecentTwoFactor } from '@/redux/slice/walletSlice';
+import { ethers } from 'ethers';
+import { useSearchParams } from 'next/navigation';
+import { useDispatch } from 'react-redux';
 
 export default function useReadContract() {
   const searchParams = useSearchParams();
@@ -13,8 +13,8 @@ export default function useReadContract() {
 
   const getThreshold = async () => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
@@ -43,8 +43,8 @@ export default function useReadContract() {
 
   const getTwoFactorCooldown = async () => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
@@ -73,8 +73,8 @@ export default function useReadContract() {
 
   const getAllGuardians = async () => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
@@ -103,8 +103,8 @@ export default function useReadContract() {
 
   const getTransferRequests = async (address) => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
@@ -135,8 +135,8 @@ export default function useReadContract() {
 
   const checkRecovery = async () => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
@@ -165,8 +165,8 @@ export default function useReadContract() {
 
   const getRecoveryRequests = async (address) => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
@@ -197,8 +197,8 @@ export default function useReadContract() {
 
   const getRecoveryRound = async () => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
@@ -227,8 +227,8 @@ export default function useReadContract() {
 
   const checkTransfer = async () => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
@@ -257,8 +257,8 @@ export default function useReadContract() {
 
   const isOwner = async (address) => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
@@ -287,8 +287,8 @@ export default function useReadContract() {
 
   const isGuardian = async (address) => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
       );
@@ -314,8 +314,8 @@ export default function useReadContract() {
 
   const is2FA = async () => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
       );
@@ -341,8 +341,8 @@ export default function useReadContract() {
 
   const getRecentTwoFactor = async () => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
       );
@@ -369,8 +369,8 @@ export default function useReadContract() {
 
   const getTimeBasedMsg = async () => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
       );
@@ -397,14 +397,14 @@ export default function useReadContract() {
 
   const getMessageHash = async (msg) => {
     try {
-      const walletAddress = searchParams.get("wallet").split(":")[1];
-      const chain = searchParams.get("wallet").split(":")[0];
+      const walletAddress = searchParams.get('wallet').split(':')[1];
+      const chain = searchParams.get('wallet').split(':')[0];
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chain
       );
 
       if (!currentConfig) {
-        return "";
+        return '';
       }
 
       const provider = new ethers.providers.JsonRpcProvider(currentConfig.rpc);
@@ -419,7 +419,7 @@ export default function useReadContract() {
       return msgHash;
     } catch (e) {
       console.log(e);
-      return "";
+      return '';
     }
   };
 

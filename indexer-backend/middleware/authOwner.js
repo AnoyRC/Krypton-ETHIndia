@@ -1,21 +1,21 @@
-const { ethers } = require("ethers");
+const { ethers } = require('ethers');
 
-const Krypton = require("../contracts/Krypton.js");
-const { ChainConfig } = require("../utils/chainConfig");
+const Krypton = require('../contracts/Krypton.js');
+const { ChainConfig } = require('../utils/ChainConfig');
 
 module.exports = async (req, res, next) => {
   try {
     const { walletAddress, kryptonAddress } = req.body;
 
-    const chain = kryptonAddress.split(":")[0];
-    const address = kryptonAddress.split(":")[1];
+    const chain = kryptonAddress.split(':')[0];
+    const address = kryptonAddress.split(':')[1];
 
     const currentConfig = ChainConfig.find(
       (c) => c.chainId.toString() === chain
     );
 
     if (!currentConfig) {
-      return res.status(400).json({ message: "Invalid chain" });
+      return res.status(400).json({ message: 'Invalid chain' });
     }
 
     const provider = new ethers.providers.JsonRpcProvider(currentConfig.rpc);
@@ -24,7 +24,7 @@ module.exports = async (req, res, next) => {
     const owner = await kryptonContract.owner();
 
     if (owner !== walletAddress) {
-      return res.status(403).json({ message: "Not an owner" });
+      return res.status(403).json({ message: 'Not an owner' });
     }
 
     req.chain = chain;

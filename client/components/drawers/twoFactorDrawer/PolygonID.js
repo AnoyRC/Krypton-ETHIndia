@@ -1,3 +1,9 @@
+'use client';
+import {
+  closeTwoFADrawer,
+  setTwoFactorAddress,
+} from '@/redux/slice/setupSlice';
+import { Button, Input } from '@material-tailwind/react';
 import { useDispatch } from 'react-redux';
 
 export default function PolygonID() {
