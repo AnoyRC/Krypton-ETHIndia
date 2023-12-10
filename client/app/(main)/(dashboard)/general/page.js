@@ -16,18 +16,21 @@ import {
 } from '@material-tailwind/react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useContractEvent } from 'wagmi';
+import { useAccount, useContractEvent } from 'wagmi';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 export default function General() {
-  const previousName = 'Old-Wallet-Name';
+  const previousName = useSelector((state) => state.setup.name);
+  const [newName, setNewName] = useState('');
   const [threshold, setThreshold] = useState(0);
   const [guardianAddress, setGuardianAddress] = useState('');
   const { getThreshold } = useReadContract();
   const searchParams = useSearchParams();
   const { initiateTransaction } = useSendTransaction();
   const isOwner = useSelector((state) => state.wallet.isOwner);
+  const { address } = useAccount();
   useContractEvent({
     address: searchParams.get('wallet').split(':')[1],
     abi: Krypton.abi,
@@ -54,6 +57,10 @@ export default function General() {
     });
   }, []);
 
+  useEffect(() => {
+    setNewName(previousName);
+  }, [previousName]);
+
   return (
     <div className="w-full h-full z-10 flex items-center justify-center">
       <Card className="w-[30rem] p-4 flex flex-col gap-4">
@@ -70,15 +77,32 @@ export default function General() {
           size="lg"
           placeholder={previousName}
           className=" !border-t-blue-gray-200 focus:!border-t-gray-900 -my-2"
+          value={newName}
           labelProps={{
             className: 'before:content-none after:content-none',
           }}
+          onChange={(e) => setNewName(e.target.value)}
         />
 
         <Button
           className="w-full text-white font-bold bg-black/80"
           size="lg"
           disabled={!isOwner}
+          onClick={async () => {
+            if (newName.length < 3) {
+              toast.error('Name must be at least 3 characters');
+              return;
+            }
+
+            await axios.put(
+              `${process.env.NEXT_PUBLIC_BANKEND_URL}/api/krypton/updateName`,
+              {
+                walletAddress: address,
+                kryptonAddress: searchParams.get('wallet'),
+                name: newName,
+              }
+            );
+          }}
         >
           Update
         </Button>

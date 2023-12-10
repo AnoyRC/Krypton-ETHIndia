@@ -1,17 +1,18 @@
-"use client";
-import { CheckIcon } from "@heroicons/react/24/outline";
-import { Button, List, ListItem, Input } from "@material-tailwind/react";
-import { useEffect, useState } from "react";
-import RecoveryRequests from "../main/dashboard/requests/RecoveryRequests";
-import { useSelector } from "react-redux";
-import useGuardian from "@/hooks/useGuardian";
-import useReadContract from "@/hooks/useReadContract";
-import { useSearchParams } from "next/navigation";
-import Krypton from "@/lib/contracts/Krypton";
-import { useAccount, useContractEvent } from "wagmi";
-import toast from "react-hot-toast";
-import { v4 as uuidv4 } from "uuid";
-import { configureAbly } from "@ably-labs/react-hooks";
+'use client';
+import { CheckIcon } from '@heroicons/react/24/outline';
+import { Button, List, ListItem, Input } from '@material-tailwind/react';
+import { useEffect, useState } from 'react';
+import RecoveryRequests from '../main/dashboard/requests/RecoveryRequests';
+import { useSelector } from 'react-redux';
+import useGuardian from '@/hooks/useGuardian';
+import useReadContract from '@/hooks/useReadContract';
+import { useSearchParams } from 'next/navigation';
+import Krypton from '@/lib/contracts/Krypton';
+import { useAccount, useContractEvent } from 'wagmi';
+import toast from 'react-hot-toast';
+import { v4 as uuidv4 } from 'uuid';
+import { configureAbly } from '@ably-labs/react-hooks';
+import axios from 'axios';
 
 export default function ExecuteRecovery({
   RecoveryRequestsData,
@@ -28,8 +29,8 @@ export default function ExecuteRecovery({
     isOwner,
     getThreshold,
   } = useReadContract();
-  const [proposedOwner, setProposedOwner] = useState("");
-  const [recoveryOwner, setRecoveryOwner] = useState("");
+  const [proposedOwner, setProposedOwner] = useState('');
+  const [recoveryOwner, setRecoveryOwner] = useState('');
   const { supportRecovery } = useGuardian();
   const isWalletOwner = useSelector((state) => state.wallet.isOwner);
   const isGuardianWallet = useSelector((state) => state.wallet.isGuardian);
@@ -38,7 +39,7 @@ export default function ExecuteRecovery({
   const { address } = useAccount();
   const { executeRecoveryUnsigned, executeRecoverySigned } = useGuardian();
   const { getTimeBasedMsg, getMessageHash } = useReadContract();
-  const [currentLink, setCurrentLink] = useState("");
+  const [currentLink, setCurrentLink] = useState('');
   const searchParam = useSearchParams();
 
   const setSelectedItem = (address) => {
@@ -50,13 +51,13 @@ export default function ExecuteRecovery({
   };
 
   useContractEvent({
-    address: searchParams.get("wallet").split(":")[1],
+    address: searchParams.get('wallet').split(':')[1],
     abi: Krypton.abi,
-    eventName: "ThresholdUpdated",
+    eventName: 'ThresholdUpdated',
     listener(log) {
       handleThreshold();
     },
-    chainId: Number(searchParams.get("wallet").split(":")[0]),
+    chainId: Number(searchParams.get('wallet').split(':')[0]),
   });
 
   useEffect(() => {
@@ -80,7 +81,7 @@ export default function ExecuteRecovery({
             placeholder="new-owner-address"
             className=" !border-t-blue-gray-200 focus:!border-t-gray-900 -my-2"
             labelProps={{
-              className: "before:content-none after:content-none",
+              className: 'before:content-none after:content-none',
             }}
             value={proposedOwner}
             onChange={(e) => setProposedOwner(e.target.value)}
@@ -92,7 +93,7 @@ export default function ExecuteRecovery({
             disabled={!isGuardian}
             onClick={async () => {
               if (!proposedOwner) {
-                toast.error("Please fill all the fields");
+                toast.error('Please fill all the fields');
               }
 
               const isProposedOwner = await isOwner(proposedOwner);
@@ -101,7 +102,7 @@ export default function ExecuteRecovery({
 
               if (isProposedOwner || isNewGuardian) {
                 toast.error(
-                  "Cannot transfer ownership to an owner or guardian"
+                  'Cannot transfer ownership to an owner or guardian'
                 );
               }
 
@@ -129,12 +130,12 @@ export default function ExecuteRecovery({
             selected={selected.includes(data.from)}
             style={{
               backgroundColor: selected.includes(data.from)
-                ? "rgba(0, 255, 255, 0.1)"
-                : "transparent",
-              borderRadius: "0.5rem",
+                ? 'rgba(0, 255, 255, 0.1)'
+                : 'transparent',
+              borderRadius: '0.5rem',
               border: selected.includes(data.from)
-                ? "1px solid rgba(0, 255, 255, 1)"
-                : "",
+                ? '1px solid rgba(0, 255, 255, 1)'
+                : '',
             }}
           >
             {selected.includes(data.from) && (
@@ -158,7 +159,7 @@ export default function ExecuteRecovery({
         placeholder="new-owner-address"
         className=" !border-t-blue-gray-200 focus:!border-t-gray-900 -my-2"
         labelProps={{
-          className: "before:content-none after:content-none",
+          className: 'before:content-none after:content-none',
         }}
         value={recoveryOwner}
         onChange={(e) => setRecoveryOwner(e.target.value)}
@@ -171,12 +172,12 @@ export default function ExecuteRecovery({
         onClick={async () => {
           if (!is2FA) {
             if (selected.length < Number(threshold)) {
-              toast.error("Please select the required number of guardians");
+              toast.error('Please select the required number of guardians');
               return;
             }
 
-            if (!recoveryOwner || recoveryOwner === "") {
-              toast.error("Please enter the new owner address");
+            if (!recoveryOwner || recoveryOwner === '') {
+              toast.error('Please enter the new owner address');
               return;
             }
 
@@ -191,7 +192,7 @@ export default function ExecuteRecovery({
             const ifIsOwner = await isOwner(recoveryOwner);
 
             if (ifIsOwner) {
-              toast.error("Cannot transfer ownership to an owner");
+              toast.error('Cannot transfer ownership to an owner');
               return;
             }
 
@@ -201,12 +202,12 @@ export default function ExecuteRecovery({
             setActiveStep(0);
           } else {
             if (selected.length < Number(threshold)) {
-              toast.error("Please select the required number of guardians");
+              toast.error('Please select the required number of guardians');
               return;
             }
 
-            if (!recoveryOwner || recoveryOwner === "") {
-              toast.error("Please enter the new owner address");
+            if (!recoveryOwner || recoveryOwner === '') {
+              toast.error('Please enter the new owner address');
               return;
             }
 
@@ -221,8 +222,8 @@ export default function ExecuteRecovery({
 
             setLink(
               `${process.env.NEXT_PUBLIC_NEXT_URL}/sign?message=${id}:${
-                searchParam.get("wallet").split(":")[0]
-              }:${searchParam.get("wallet").split(":")[1]}:${messageHash}`
+                searchParam.get('wallet').split(':')[0]
+              }:${searchParam.get('wallet').split(':')[1]}:${messageHash}`
             );
 
             const ably = configureAbly({
@@ -230,14 +231,22 @@ export default function ExecuteRecovery({
             });
 
             let channel = ably.channels.get(
-              `${id}:${searchParam.get("wallet").split(":")[0]}:${
-                searchParam.get("wallet").split(":")[1]
+              `${id}:${searchParam.get('wallet').split(':')[0]}:${
+                searchParam.get('wallet').split(':')[1]
               }:${messageHash}`
             );
 
             channel.subscribe(async (msg) => {
               setActiveStep(2);
               await executeRecoverySigned(recoveryOwner, selected, msg.data);
+              await axios.put(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/recovery`,
+                {
+                  walletAddress: address,
+                  kryptonAddress: searchParams.get('wallet').split(':')[1],
+                  proposedOwner: recoveryOwner,
+                }
+              );
               setIsExecuting(false);
               setActiveStep(0);
             });

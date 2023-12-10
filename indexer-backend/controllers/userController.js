@@ -1,15 +1,17 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const User = require("../models/userModel");
-const Krypton = require("../models/kryptonModel");
+const User = require('../models/userModel');
+const Krypton = require('../models/kryptonModel');
 
 const getUser = async (req, res) => {
   try {
-    const user = await User.findOne({ wallet: req.params.walletAddress });
+    const user = await User.findOne({
+      walletAddress: req.params.walletAddress,
+    });
 
     if (!user) {
       const newUser = new User({
-        wallet: req.params.wallet,
+        walletAddress: req.params.walletAddress,
         guardianWallet: [],
       });
 
@@ -43,13 +45,13 @@ const executeRecovery = async (req, res) => {
     const krypton = await Krypton.findOne({ kryptonAddress });
 
     if (!krypton) {
-      return res.status(404).json({ message: "Krypton not found" });
+      return res.status(404).json({ message: 'Krypton not found' });
     }
 
     const proposedOwner = req.body.proposedOwner;
 
     if (!proposedOwner) {
-      return res.status(400).json({ message: "Proposed owner not given" });
+      return res.status(400).json({ message: 'Proposed owner not given' });
     }
 
     krypton.walletAddress = proposedOwner;

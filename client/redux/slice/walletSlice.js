@@ -1,17 +1,17 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const walletSlice = createSlice({
-  name: "wallet",
+  name: 'wallet',
 
   initialState: {
-    status: "Good",
-    owner: "",
+    status: 'Good',
+    user: null,
     isOwner: false,
     isGuardian: false,
     is2FA: false,
-    fnName: "",
+    fnName: '',
     fnArgs: [],
-    successMessage: "",
+    successMessage: '',
     twoFactorCooldown: 0,
     recentTwoFactor: 0,
   },
@@ -44,9 +44,6 @@ const walletSlice = createSlice({
     setRecentTwoFactor: (state, action) => {
       state.recentTwoFactor = action.payload;
     },
-    setOwner: (state, action) => {
-      state.owner = action.payload;
-    },
   },
 });
 
@@ -60,7 +57,6 @@ export const {
   setSuccessMessage,
   setTwoFactorCooldown,
   setRecentTwoFactor,
-  setOwner,
 } = walletSlice.actions;
 
 export default walletSlice.reducer;

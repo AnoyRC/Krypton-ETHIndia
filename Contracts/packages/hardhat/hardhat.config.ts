@@ -26,7 +26,7 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  defaultNetwork: "polygonMumbai",
+  defaultNetwork: "arbitrumGoerli",
   namedAccounts: {
     deployer: {
       // By default, it will take the first Hardhat account as the deployer
@@ -115,7 +115,8 @@ const config: HardhatUserConfig = {
       accounts: [deployerPrivateKey],
     },
     scrollSepolia: {
-      url: "https://sepolia-rpc.scroll.io",
+      url: "https://rpc.ankr.com/scroll_sepolia_testnet",
+      gasPrice: 700000000,
       accounts: [deployerPrivateKey],
     },
     scroll: {
@@ -128,6 +129,10 @@ const config: HardhatUserConfig = {
     },
     pgnTestnet: {
       url: "https://sepolia.publicgoods.network",
+      accounts: [deployerPrivateKey],
+    },
+    alfajores: {
+      url: "https://alfajores-forno.celo-testnet.org",
       accounts: [deployerPrivateKey],
     },
   },

@@ -23,7 +23,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useAccount } from 'wagmi';
+import { useAccount, useNetwork } from 'wagmi';
+import axios from 'axios';
 
 export default function Step4() {
   const chain = useSelector((state) => state.setup.chain);
@@ -45,18 +46,6 @@ export default function Step4() {
   const { address } = useAccount();
 
   const execute = async () => {
-    // setTimeout(() => {
-    //   setSteps(1);
-    // }, 1000);
-    // setTimeout(() => {
-    //   setSteps(2);
-    // }, 3000);
-    // setTimeout(() => {
-    //   setSteps(3);
-    // }, 5000);
-    // setTimeout(() => {
-    //   setIsDeployed(true);
-    // }, 7000);
     const walletAddress = await createKrypton();
     if (!walletAddress) {
       setIsError(true);
@@ -69,14 +58,28 @@ export default function Step4() {
     setSteps(1);
 
     await axios
-      .post('/api/krypton/create', {
+      .post(`${process.env.NEXT_PUBLIC_BANKEND_URL}/api/krypton/create`, {
         kryptonName: name,
         walletAddress: address,
-        kryptonAddress: walletAddress,
+        kryptonAddress: `${chain}:${walletAddress}`,
       })
       .then((res) => {
         console.log(res.data);
       });
+
+    await Promise.all(
+      guardians.map((guardian) => {
+        axios.post(
+          `${process.env.NEXT_PUBLIC_BANKEND_URL}/api/krypton/addGuardian`,
+          {
+            kryptonAddress: walletAddress,
+            walletAddress: address,
+            guardianName: guardian.name,
+            guardianAddress: guardian.address,
+          }
+        );
+      })
+    );
     setSteps(2);
 
     if (!twoFactorAddress) {

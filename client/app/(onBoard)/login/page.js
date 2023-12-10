@@ -1,29 +1,29 @@
 "use client";
 
+import { setUser } from '@/redux/slice/walletSlice';
 import {
   CardHeader,
   CardBody,
   CardFooter,
   Typography,
   Button,
-} from "@material-tailwind/react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { useAccount, useConnect } from "wagmi";
+} from '@material-tailwind/react';
+import axios from 'axios';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useAccount, useConnect } from 'wagmi';
 
 export default function Login() {
   const router = useRouter();
   const dispatch = useDispatch();
 
   const { isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
 
   useEffect(() => {
-   
     if (isConnected) {
-      router.push("/wallet");
+      router.push('/wallet');
     }
   }, [isConnected]);
 

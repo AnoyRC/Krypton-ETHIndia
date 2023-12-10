@@ -1,21 +1,21 @@
-const { ethers } = require("ethers");
+const { ethers } = require('ethers');
 
-const Krypton = require("../contracts/Krypton.js");
-const { ChainConfig } = require("../utils/chainConfig");
+const Krypton = require('../contracts/Krypton.js');
+const { ChainConfig } = require('../utils/ChainConfig');
 
 module.exports = async (req, res, next) => {
   try {
     const { kryptonAddress, walletAddress } = req.body;
 
-    const chain = kryptonAddress.split(":")[0];
-    const address = kryptonAddress.split(":")[1];
+    const chain = kryptonAddress.split(':')[0];
+    const address = kryptonAddress.split(':')[1];
 
     const currentConfig = ChainConfig.find(
       (c) => c.chainId.toString() === chain
     );
 
     if (!currentConfig) {
-      return res.status(400).json({ message: "Invalid chain" });
+      return res.status(400).json({ message: 'Invalid chain' });
     }
 
     const provider = new ethers.providers.JsonRpcProvider(currentConfig.rpc);
@@ -24,7 +24,7 @@ module.exports = async (req, res, next) => {
     const isGdn = await kryptonContract.isGuardian(walletAddress);
 
     if (!isGdn) {
-      return res.status(403).json({ message: "Not a guardian" });
+      return res.status(403).json({ message: 'Not a guardian' });
     }
 
     req.chain = chain;

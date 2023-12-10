@@ -32,6 +32,11 @@ export default function Navbar() {
       link: `/transfer?wallet=${searchParams.get("wallet")}`,
     },
     {
+      title: "Swap",
+      description: "Swap your tokens for another.",
+      link: `/swap?wallet=${searchParams.get("wallet")}`,
+    },
+    {
       title: "Tokens",
       description: "View all of your tokens.",
       link: `/tokens?wallet=${searchParams.get("wallet")}`,
@@ -83,7 +88,7 @@ export default function Navbar() {
 
         <div className="flex items-center mt-2 ml-7">
           <Link
-            href={"#"}
+            href={`/home?wallet=${searchParams.get("wallet")}`}
             id=":RkrqukqH2:"
             variant="text"
             className="align-middle select-none text-center transition-all mr-4 disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none py-3 px-6 rounded-lg text-gray-900 hover:bg-gray-900/10 active:bg-gray-900/20 flex items-center gap-3 text-base font-normal capitalize tracking-normal font-uni outline-none"

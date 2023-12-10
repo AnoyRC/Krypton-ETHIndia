@@ -2,7 +2,9 @@
 
 import { MapPinIcon, UserIcon } from "@heroicons/react/24/outline";
 
-export default function GuardianCard({ name, address, id }) {
+export default function GuardianCard({ address, id }) {
+  const name = null;
+  // Use Dataverse OS
 
   return (
     <div className="flex flex-row px-6 py-4 items-center border-black border-[1px] rounded-lg text-black font-bold justify-between gap-1 capitalize text-lg font-uni">

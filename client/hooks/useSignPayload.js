@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { ChainConfig } from "@/lib/ChainConfig";
+import { ChainConfig } from '@/lib/ChainConfig';
 import {
   closeMessageDrawer,
   setSignature,
-} from "@/redux/slice/sigManagerSlice";
-import { useSearchParams } from "next/navigation";
-import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { keccak256 } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import Web3 from "web3";
-import useReadContract from "./useReadContract";
-import { ethers } from "ethers";
-import Krypton from "@/lib/contracts/Krypton";
-import { useEthersSigner } from "@/wagmi/EthersSigner";
-import { useRouter } from "next/navigation";
-import { configureAbly } from "@ably-labs/react-hooks";
+} from '@/redux/slice/sigManagerSlice';
+import { useSearchParams } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { keccak256 } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+import Web3 from 'web3';
+import useReadContract from './useReadContract';
+import { ethers } from 'ethers';
+import Krypton from '@/lib/contracts/Krypton';
+import { useEthersSigner } from '@/wagmi/EthersSigner';
+import { useRouter } from 'next/navigation';
+import { configureAbly } from '@ably-labs/react-hooks';
 
 export default function useSignPayload() {
   const dispatch = useDispatch();
@@ -30,10 +30,10 @@ export default function useSignPayload() {
     const messageHash = await getMessageHash(message);
 
     const inputs = Array.isArray(id) ? id : [id];
-    const hash = inputs.reduce((acc, curr) => acc + curr, "");
+    const hash = inputs.reduce((acc, curr) => acc + curr, '');
 
     const currentConfig = ChainConfig.find(
-      (c) => c.chainId.toString() === searchParams.get("wallet").split(":")[0]
+      (c) => c.chainId.toString() === searchParams.get('wallet').split(':')[0]
     );
 
     if (!currentConfig) {
@@ -62,7 +62,7 @@ export default function useSignPayload() {
       const messageHash = await KryptonContract.getMessageHash(message);
 
       const inputs = Array.isArray(id) ? id : [id];
-      const hash = inputs.reduce((acc, curr) => acc + curr, "");
+      const hash = inputs.reduce((acc, curr) => acc + curr, '');
 
       const currentConfig = ChainConfig.find(
         (c) => c.chainId.toString() === chainId
@@ -86,15 +86,15 @@ export default function useSignPayload() {
   };
 
   const signRecoveryMessage = async (id) => {
-    const message = searchParams.get("message");
+    const message = searchParams.get('message');
 
-    const uid = message.split(":")[0];
-    const chainId = message.split(":")[1];
-    const walletAddress = message.split(":")[2];
-    const payload = message.split(":")[3];
+    const uid = message.split(':')[0];
+    const chainId = message.split(':')[1];
+    const walletAddress = message.split(':')[2];
+    const payload = message.split(':')[3];
 
     const inputs = Array.isArray(id) ? id : [id];
-    const hash = inputs.reduce((acc, curr) => acc + curr, "");
+    const hash = inputs.reduce((acc, curr) => acc + curr, '');
 
     const currentConfig = ChainConfig.find(
       (c) => c.chainId.toString() === chainId
@@ -125,9 +125,9 @@ export default function useSignPayload() {
       `${uid}:${chainId}:${walletAddress}:${payload}`
     );
 
-    channel.publish("signature", signature.signature);
+    channel.publish('signature', signature.signature);
 
-    router.push("/login");
+    router.push('/login');
   };
 
   return { signMessage, signInitateMessage, signRecoveryMessage };

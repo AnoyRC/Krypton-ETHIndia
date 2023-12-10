@@ -1,6 +1,6 @@
-import { LockClosedIcon } from '@heroicons/react/24/solid';
+import { LockClosedIcon } from "@heroicons/react/24/solid";
 
-import Image from 'next/image';
+import Image from "next/image";
 
 const ChatBackground = () => {
   return (
